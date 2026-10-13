@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.wtk_apps.workoutbase.timer.MAX_PHASE_SECONDS
 import com.wtk_apps.workoutbase.timer.TimerConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -82,9 +83,9 @@ class SettingsRepository(context: Context) {
   private fun Preferences.readConfigFields(defaults: TimerConfig): TimerConfig =
     TimerConfig(
       rounds = (this[KEY_ROUNDS] ?: defaults.rounds).coerceIn(1, 99),
-      workMillis = (this[KEY_WORK_SEC] ?: defaults.seconds(defaults.workMillis)).coerceIn(1, 3_600) * 1_000L,
-      restMillis = (this[KEY_REST_SEC] ?: defaults.seconds(defaults.restMillis)).coerceIn(0, 3_600) * 1_000L,
-      prepareMillis = (this[KEY_PREPARE_SEC] ?: defaults.seconds(defaults.prepareMillis)).coerceIn(0, 600) * 1_000L,
+      workMillis = (this[KEY_WORK_SEC] ?: defaults.seconds(defaults.workMillis)).coerceIn(1, MAX_PHASE_SECONDS) * 1_000L,
+      restMillis = (this[KEY_REST_SEC] ?: defaults.seconds(defaults.restMillis)).coerceIn(0, MAX_PHASE_SECONDS) * 1_000L,
+      prepareMillis = (this[KEY_PREPARE_SEC] ?: defaults.seconds(defaults.prepareMillis)).coerceIn(0, MAX_PHASE_SECONDS) * 1_000L,
       countdownSeconds = (this[KEY_COUNTDOWN_SEC] ?: defaults.countdownSeconds).coerceIn(0, 10),
       halfWayEnabled = this[KEY_HALF_WAY] ?: defaults.halfWayEnabled,
       countdownEnabled = this[KEY_COUNTDOWN_ENABLED] ?: defaults.countdownEnabled,
@@ -113,9 +114,9 @@ class SettingsRepository(context: Context) {
       runCatching {
           TimerConfig(
             rounds = (this[pRounds(index)] ?: defaults.rounds).coerceIn(1, 99),
-            workMillis = (this[pWork(index)] ?: defaults.seconds(defaults.workMillis)).coerceIn(1, 3_600) * 1_000L,
-            restMillis = (this[pRest(index)] ?: defaults.seconds(defaults.restMillis)).coerceIn(0, 3_600) * 1_000L,
-            prepareMillis = (this[pPrepare(index)] ?: defaults.seconds(defaults.prepareMillis)).coerceIn(0, 600) * 1_000L,
+            workMillis = (this[pWork(index)] ?: defaults.seconds(defaults.workMillis)).coerceIn(1, MAX_PHASE_SECONDS) * 1_000L,
+            restMillis = (this[pRest(index)] ?: defaults.seconds(defaults.restMillis)).coerceIn(0, MAX_PHASE_SECONDS) * 1_000L,
+            prepareMillis = (this[pPrepare(index)] ?: defaults.seconds(defaults.prepareMillis)).coerceIn(0, MAX_PHASE_SECONDS) * 1_000L,
             countdownSeconds = (this[pCountdown(index)] ?: defaults.countdownSeconds).coerceIn(0, 10),
             halfWayEnabled = this[pHalfWay(index)] ?: defaults.halfWayEnabled,
             countdownEnabled = this[pCountdownEnabled(index)] ?: defaults.countdownEnabled,

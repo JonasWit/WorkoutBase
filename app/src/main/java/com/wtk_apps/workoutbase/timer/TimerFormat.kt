@@ -8,6 +8,12 @@ fun formatMillis(millis: Long): String {
   return "%02d:%02d".format(minutes, seconds)
 }
 
+/**
+ * Longest allowed phase duration in seconds (99:59). Keeping minutes to two
+ * digits means the clock never exceeds the `MM:SS` format.
+ */
+const val MAX_PHASE_SECONDS = 99 * 60 + 59
+
 /** Human readable label for a phase (English UI). */
 fun TimerPhase.label(): String =
   when (this) {

@@ -43,6 +43,7 @@ import com.wtk_apps.workoutbase.theme.Surface2
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.timer.TimerConfig
+import com.wtk_apps.workoutbase.timer.MAX_PHASE_SECONDS
 
 /**
  * The session/cues form, shared between the global Settings screen and the
@@ -60,13 +61,13 @@ internal fun TrainingConfigForm(
     NumberSetting("Rounds", config.rounds, step = 1, range = 1..99) {
       onConfigChange(config.copy(rounds = it))
     }
-    NumberSetting("Work (s)", (config.workMillis / 1000).toInt(), step = 5, range = 5..3600) {
+    NumberSetting("Work (s)", (config.workMillis / 1000).toInt(), step = 5, range = 5..MAX_PHASE_SECONDS) {
       onConfigChange(config.copy(workMillis = it * 1000L))
     }
-    NumberSetting("Rest (s)", (config.restMillis / 1000).toInt(), step = 5, range = 0..3600) {
+    NumberSetting("Rest (s)", (config.restMillis / 1000).toInt(), step = 5, range = 0..MAX_PHASE_SECONDS) {
       onConfigChange(config.copy(restMillis = it * 1000L))
     }
-    NumberSetting("Prepare (s)", (config.prepareMillis / 1000).toInt(), step = 5, range = 0..600) {
+    NumberSetting("Prepare (s)", (config.prepareMillis / 1000).toInt(), step = 5, range = 0..MAX_PHASE_SECONDS) {
       onConfigChange(config.copy(prepareMillis = it * 1000L))
     }
 
@@ -126,8 +127,20 @@ private fun NumberSetting(
         value = draft ?: value.toString(),
         onValueChange = { new ->
           val digits = new.filter { it.isDigit() }.take(4)
-          draft = digits
-          digits.toIntOrNull()?.let { if (it in range) onChange(it) }
+          val parsed = digits.toIntOrNull()
+          when {
+            // Still typing (e.g. "3" on the way to "30") — keep the draft.
+            parsed == null || parsed < range.first -> draft = digits
+            // Over the maximum: clamp immediately so it can never be exceeded.
+            parsed > range.last -> {
+              draft = range.last.toString()
+              onChange(range.last)
+            }
+            else -> {
+              draft = digits
+              onChange(parsed)
+            }
+          }
         },
         singleLine = true,
         textStyle = TextStyle(color = TextPrimary, fontSize = 16.sp, textAlign = TextAlign.Center),
