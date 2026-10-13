@@ -56,6 +56,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -214,24 +215,25 @@ private fun ParamChip(
     )
 
   val shape = RoundedCornerShape(10.dp)
-  val glowAlpha = if (active) 0.30f + 0.5f * pulse else 0f
-  val borderWidth = if (active) 2.dp else 1.dp
-  val borderAlpha = if (active) 0.75f + 0.25f * pulse else 0.7f
+  val glowAlpha = if (active) 0.45f + 0.55f * pulse else 0f
+  val borderWidth = if (active) 3.dp else 1.dp
+  val borderAlpha = if (active) 0.85f + 0.15f * pulse else 0.7f
+  val scale = if (active) 1f + 0.03f * pulse else 1f
 
-  Box(modifier = modifier) {
+  Box(modifier = modifier.graphicsLayer { scaleX = scale; scaleY = scale }) {
     if (active) {
       Box(
         modifier =
           Modifier.matchParentSize()
-            .border(3.dp, accent.copy(alpha = glowAlpha), shape)
-            .blur(9.dp),
+            .border(4.dp, accent.copy(alpha = glowAlpha), shape)
+            .blur(13.dp),
       )
     }
     Column(
       modifier =
         Modifier.fillMaxWidth()
           .clip(shape)
-          .background(Surface2.copy(alpha = if (active) 0.95f else 0.75f))
+          .background(Surface2.copy(alpha = if (active) 1f else 0.75f))
           .border(borderWidth, accent.copy(alpha = borderAlpha), shape)
           .padding(horizontal = 6.dp, vertical = 6.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
