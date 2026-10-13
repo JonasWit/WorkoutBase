@@ -36,7 +36,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -85,6 +89,15 @@ fun TimerScreen(
   }
 
   val phaseColor = phaseColor(state)
+  // Flames move at a different pace per phase: brisk on work, medium on prepare
+  // and slow/calm on rest.
+  val flameSpeed =
+    when (state.phase) {
+      TimerPhase.WORK -> 2.6f
+      TimerPhase.PREPARE -> 1.2f
+      TimerPhase.REST -> 0.55f
+      TimerPhase.IDLE, TimerPhase.FINISHED -> 0.9f
+    }
   val ringProgress by
     animateFloatAsState(
       targetValue = state.progress,
@@ -93,7 +106,7 @@ fun TimerScreen(
     )
 
   Box(modifier = modifier.fillMaxSize()) {
-    FlameBackground(color = phaseColor)
+    FlameBackground(color = phaseColor, speed = flameSpeed)
 
     // Top bar, pinned to the top edge.
     Row(
@@ -256,9 +269,9 @@ private fun phaseColor(state: TimerState): Color {
  * older devices it falls back to the procedural flame shapes.
  */
 @Composable
-private fun FlameBackground(color: Color) {
+private fun FlameBackground(color: Color, speed: Float) {
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-    FireShaderBackground(color)
+    FireShaderBackground(color, speed)
   } else {
     ProceduralFlameBackground(color)
   }
@@ -325,15 +338,23 @@ half4 main(float2 fragCoord) {
 """
 
 @Composable
-private fun FireShaderBackground(color: Color) {
-  val transition = rememberInfiniteTransition(label = "fire")
-  val clock by
-    transition.animateFloat(
-      initialValue = 0f,
-      targetValue = 3600f,
-      animationSpec = infiniteRepeatable(tween(3_600_000, easing = LinearEasing), RepeatMode.Restart),
-      label = "fireClock",
-    )
+private fun FireShaderBackground(color: Color, speed: Float) {
+  // Accumulate flame time by integrating the current speed, so changing the pace
+  // (e.g. entering a work round) never makes the flames jump.
+  val fireTime = remember { mutableFloatStateOf(0f) }
+  val currentSpeed = rememberUpdatedState(speed)
+  LaunchedEffect(Unit) {
+    var last = 0L
+    while (true) {
+      withFrameNanos { now ->
+        if (last != 0L) {
+          fireTime.floatValue += ((now - last) / 1_000_000_000f) * currentSpeed.value
+        }
+        last = now
+      }
+    }
+  }
+
   val shader = remember { RuntimeShader(FIRE_AGSL) }
   val r = color.red
   val g = color.green
@@ -341,7 +362,7 @@ private fun FireShaderBackground(color: Color) {
 
   Canvas(modifier = Modifier.fillMaxSize()) {
     shader.setFloatUniform("uResolution", size.width, size.height)
-    shader.setFloatUniform("uTime", clock)
+    shader.setFloatUniform("uTime", fireTime.floatValue)
     shader.setFloatUniform("uColorR", r)
     shader.setFloatUniform("uColorG", g)
     shader.setFloatUniform("uColorB", b)
