@@ -78,7 +78,6 @@ import com.wtk_apps.workoutbase.timer.label
 @Composable
 fun TimerScreen(
   onOpenSettings: () -> Unit,
-  onOpenStopwatch: () -> Unit,
   onOpenTrainings: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -145,10 +144,7 @@ fun TimerScreen(
     ) {
       Controls(state = state)
       Spacer(Modifier.height(8.dp))
-      Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        BottomLink("Trainings", onOpenTrainings)
-        BottomLink("Stopwatch", onOpenStopwatch)
-      }
+      BottomLink("Trainings", onOpenTrainings)
     }
   }
 }
