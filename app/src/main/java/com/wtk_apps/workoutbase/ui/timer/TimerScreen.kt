@@ -126,7 +126,7 @@ fun TimerScreen(
 
     // Phase label + dial, centred on the screen.
     Column(
-      modifier = Modifier.align(Alignment.Center).offset(y = (-28).dp),
+      modifier = Modifier.align(Alignment.Center).fillMaxWidth().offset(y = (-28).dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       PhaseHeader(state = state, color = phaseColor)
@@ -174,12 +174,14 @@ private fun PhaseHeader(state: TimerState, color: Color) {
     letterSpacing = 6.sp,
   )
   Spacer(Modifier.height(10.dp))
-  Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-    ParamChip("WORK", formatMillis(state.config.workMillis), WorkYellow)
-    ParamChip("REST", formatMillis(state.config.restMillis), RestGreen)
-    if (state.config.prepareMillis > 0) {
-      ParamChip("PREP", formatMillis(state.config.prepareMillis), PrepareBlue)
-    }
+  Row(
+    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+    horizontalArrangement = Arrangement.spacedBy(6.dp),
+  ) {
+    ParamChip("ROUNDS", state.config.rounds.toString(), AccentGold, Modifier.weight(1f))
+    ParamChip("WORK", formatMillis(state.config.workMillis), WorkYellow, Modifier.weight(1f))
+    ParamChip("REST", formatMillis(state.config.restMillis), RestGreen, Modifier.weight(1f))
+    ParamChip("PREP", formatMillis(state.config.prepareMillis), PrepareBlue, Modifier.weight(1f))
   }
   if (state.round > 0) {
     Spacer(Modifier.height(10.dp))
@@ -194,13 +196,14 @@ private fun PhaseHeader(state: TimerState, color: Color) {
 
 /** Small parameter chip with a border in its phase colour. */
 @Composable
-private fun ParamChip(label: String, value: String, accent: Color) {
+private fun ParamChip(label: String, value: String, accent: Color, modifier: Modifier = Modifier) {
   Column(
     modifier =
-      Modifier.clip(RoundedCornerShape(9.dp))
+      modifier
+        .clip(RoundedCornerShape(9.dp))
         .background(Surface2.copy(alpha = 0.75f))
         .border(1.dp, accent.copy(alpha = 0.7f), RoundedCornerShape(9.dp))
-        .padding(horizontal = 12.dp, vertical = 5.dp),
+        .padding(horizontal = 6.dp, vertical = 5.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     Text(label, color = accent, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
