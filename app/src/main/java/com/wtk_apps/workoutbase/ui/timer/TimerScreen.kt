@@ -1,5 +1,7 @@
 package com.wtk_apps.workoutbase.ui.timer
 
+import android.graphics.BlurMaskFilter
+import android.graphics.Paint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -33,10 +35,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -229,27 +233,28 @@ private fun PulsingEdgeGlow(color: Color, active: Boolean) {
   val transition = rememberInfiniteTransition(label = "edge")
   val pulse by
     transition.animateFloat(
-      initialValue = 0.28f,
-      targetValue = 0.62f,
-      animationSpec = infiniteRepeatable(tween(1500, easing = LinearEasing), RepeatMode.Reverse),
+      initialValue = 0.30f,
+      targetValue = 0.66f,
+      animationSpec = infiniteRepeatable(tween(1600, easing = LinearEasing), RepeatMode.Reverse),
       label = "edgePulse",
     )
-  val alpha = if (active) pulse else 0.26f
+  val alpha = if (active) pulse else 0.28f
 
   Canvas(modifier = Modifier.fillMaxSize()) {
-    val w = size.width
-    val h = size.height
-    val band = minOf(w, h) * 0.16f
-    val edge = color.copy(alpha = alpha)
-    val clear = color.copy(alpha = 0f)
-
-    // Glow inwards from each screen edge.
-    drawRect(Brush.verticalGradient(listOf(edge, clear), startY = 0f, endY = band), topLeft = Offset(0f, 0f), size = androidx.compose.ui.geometry.Size(w, band))
-    drawRect(Brush.verticalGradient(listOf(clear, edge), startY = h - band, endY = h), topLeft = Offset(0f, h - band), size = androidx.compose.ui.geometry.Size(w, band))
-    drawRect(Brush.horizontalGradient(listOf(edge, clear), startX = 0f, endX = band), topLeft = Offset(0f, 0f), size = androidx.compose.ui.geometry.Size(band, h))
-    drawRect(Brush.horizontalGradient(listOf(clear, edge), startX = w - band, endX = w), topLeft = Offset(w - band, 0f), size = androidx.compose.ui.geometry.Size(band, h))
-
-    // A soft rim to define the border.
-    drawRect(color = color.copy(alpha = alpha * 0.7f), style = Stroke(width = 2.dp.toPx()))
+    val minSide = minOf(size.width, size.height)
+    drawIntoCanvas { canvas ->
+      val paint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+          style = Paint.Style.STROKE
+          this.color = color.toArgb()
+          this.alpha = (alpha.coerceIn(0f, 1f) * 255f).toInt()
+          strokeWidth = minSide * 0.62f
+          maskFilter = BlurMaskFilter(minSide * 0.17f, BlurMaskFilter.Blur.NORMAL)
+        }
+      val radius = minSide * 0.30f
+      // Drawn on the screen bounds so only the inner, blurred half is visible:
+      // a soft, rounded glow that fades smoothly into the black centre.
+      canvas.nativeCanvas.drawRoundRect(0f, 0f, size.width, size.height, radius, radius, paint)
+    }
   }
 }
