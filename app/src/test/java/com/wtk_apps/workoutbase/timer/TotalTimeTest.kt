@@ -61,4 +61,36 @@ class TotalTimeTest {
     assertEquals(TimerPhase.FINISHED, finished.phase)
     assertEquals(0L, totalRemainingMillis(finished))
   }
+
+  @Test
+  fun walkingThroughTheSession_consumesExactlyTheTotalTime() {
+    val cfg = config(rounds = 4, workMillis = 3_000L, restMillis = 2_000L, prepareMillis = 1_000L)
+    var state = TimerEngine.start(TimerEngine.initialState(cfg)).state
+    var elapsed = 0L
+    var guard = 0
+    while (state.phase != TimerPhase.FINISHED && guard < 10_000) {
+      state = TimerEngine.tick(state, 1_000L).state
+      elapsed += 1_000L
+      guard++
+    }
+    assertEquals(TimerPhase.FINISHED, state.phase)
+    // 1 + 4*3 + 3*2 = 19 s
+    assertEquals(totalSessionMillis(cfg), elapsed)
+    assertEquals(0L, totalRemainingMillis(state))
+  }
+
+  @Test
+  fun remaining_decreasesExactlyByElapsedTime() {
+    val cfg = config(rounds = 3, workMillis = 5_000L, restMillis = 4_000L, prepareMillis = 3_000L)
+    var state = TimerEngine.start(TimerEngine.initialState(cfg)).state
+    while (state.phase != TimerPhase.FINISHED) {
+      val before = totalRemainingMillis(state)
+      state = TimerEngine.tick(state, 500L).state
+      val after = totalRemainingMillis(state)
+      if (state.phase != TimerPhase.FINISHED) {
+        assertEquals("remaining should drop by the tick", before - 500L, after)
+      }
+    }
+    assertEquals(0L, totalRemainingMillis(state))
+  }
 }
