@@ -180,4 +180,47 @@ class TimerEngineTest {
     assertEquals(TimerPhase.IDLE, reset.phase)
     assertFalse(reset.running)
   }
+
+  @Test
+  fun rest_emitsThreeCountdownCuesBeforeNextRound() {
+    val started = TimerEngine.start(TimerEngine.initialState(config(restMillis = 5_000L))).state
+    val inRest = TimerEngine.tick(started, 10_000L).state
+    assertEquals(TimerPhase.REST, inRest.phase)
+
+    val atThree = TimerEngine.tick(inRest, 2_000L)
+    val atTwo = TimerEngine.tick(atThree.state, 1_000L)
+    val atOne = TimerEngine.tick(atTwo.state, 1_000L)
+    val intoRound = TimerEngine.tick(atOne.state, 1_000L)
+
+    assertEquals(1, atThree.cues.count { it == TimerCue.COUNTDOWN })
+    assertEquals(1, atTwo.cues.count { it == TimerCue.COUNTDOWN })
+    assertEquals(1, atOne.cues.count { it == TimerCue.COUNTDOWN })
+    assertEquals(TimerPhase.WORK, intoRound.state.phase)
+    assertTrue(intoRound.cues.contains(TimerCue.WORK_START))
+  }
+
+  @Test
+  fun prepare_emitsCountdownBeforeFirstRound() {
+    val started = TimerEngine.start(TimerEngine.initialState(config(prepareMillis = 5_000L))).state
+    assertEquals(TimerPhase.PREPARE, started.phase)
+
+    val atThree = TimerEngine.tick(started, 2_000L)
+    val atTwo = TimerEngine.tick(atThree.state, 1_000L)
+    val atOne = TimerEngine.tick(atTwo.state, 1_000L)
+    val intoRound = TimerEngine.tick(atOne.state, 1_000L)
+
+    assertEquals(1, atThree.cues.count { it == TimerCue.COUNTDOWN })
+    assertEquals(1, atTwo.cues.count { it == TimerCue.COUNTDOWN })
+    assertEquals(1, atOne.cues.count { it == TimerCue.COUNTDOWN })
+    assertEquals(TimerPhase.WORK, intoRound.state.phase)
+    assertTrue(intoRound.cues.contains(TimerCue.WORK_START))
+  }
+
+  @Test
+  fun rest_doesNotEmitHalfWayCue() {
+    val started = TimerEngine.start(TimerEngine.initialState(config(restMillis = 6_000L))).state
+    val inRest = TimerEngine.tick(started, 10_000L).state
+    val atHalf = TimerEngine.tick(inRest, 3_000L)
+    assertFalse(atHalf.cues.contains(TimerCue.HALF_WAY))
+  }
 }

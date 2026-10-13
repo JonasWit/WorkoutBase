@@ -225,24 +225,33 @@ object TimerEngine {
     }
 
   private fun cuesBetween(state: TimerState, beforeMillis: Long, afterMillis: Long): List<TimerCue> {
-    if (state.phase != TimerPhase.WORK) return emptyList()
     val config = state.config
     val cues = mutableListOf<TimerCue>()
 
-    val half = state.phaseMillis / 2L
-    if (config.halfWayEnabled && half > 0L && beforeMillis > half && afterMillis <= half) {
-      cues += TimerCue.HALF_WAY
+    if (state.phase == TimerPhase.WORK) {
+      val half = state.phaseMillis / 2L
+      if (config.halfWayEnabled && half > 0L && beforeMillis > half && afterMillis <= half) {
+        cues += TimerCue.HALF_WAY
+      }
+      if (config.warnEnabled && config.warnMillis > 0L && beforeMillis > config.warnMillis && afterMillis <= config.warnMillis) {
+        cues += TimerCue.WARN
+      }
     }
-    if (config.warnEnabled && config.warnMillis > 0L && beforeMillis > config.warnMillis && afterMillis <= config.warnMillis) {
-      cues += TimerCue.WARN
-    }
-    if (config.countdownEnabled && config.countdownSeconds > 0) {
+
+    // A 3-2-1 countdown runs at the end of every phase that leads into (or ends)
+    // a work round: prepare -> first round, rest -> next round, and the round's
+    // own final seconds.
+    val countdownPhase =
+      state.phase == TimerPhase.WORK || state.phase == TimerPhase.REST || state.phase == TimerPhase.PREPARE
+    if (countdownPhase && config.countdownEnabled && config.countdownSeconds > 0) {
       val limit = config.countdownSeconds * 1_000L
       if (afterMillis in 1L..limit) {
-        var second = ceilToSecond(beforeMillis)
-        val afterSecond = ceilToSecond(afterMillis)
-        while (second > afterSecond && second >= 1L && second <= config.countdownSeconds.toLong()) {
-          cues += TimerCue.COUNTDOWN
+        // Emit one cue for each whole-second the displayed countdown moves into
+        // (e.g. it becomes 3, then 2, then 1 second remaining).
+        var second = ceilToSecond(beforeMillis) - 1L
+        val lastSecond = ceilToSecond(afterMillis)
+        while (second >= lastSecond && second >= 1L) {
+          if (second <= config.countdownSeconds.toLong()) cues += TimerCue.COUNTDOWN
           second--
         }
       }
