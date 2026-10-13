@@ -16,6 +16,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -60,6 +61,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -118,52 +120,34 @@ fun TimerScreen(
   Box(modifier = modifier.fillMaxSize()) {
     FlameBackground(color = phaseColor, speed = flameSpeed)
 
-    // Centred Roman title.
     Column(
-      modifier =
-        Modifier.align(Alignment.TopCenter)
-          .fillMaxWidth()
-          .safeDrawingPadding()
-          .padding(top = 10.dp),
+      modifier = Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 16.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+      // Roman title, single line.
       Text(
-        text = "WORKOUT",
+        text = "WORKOUTBASE",
         color = AccentGold,
         fontFamily = RomanTitleFont,
-        fontSize = 21.sp,
-        letterSpacing = 2.sp,
-        lineHeight = 20.sp,
+        fontSize = 22.sp,
+        letterSpacing = 3.sp,
+        modifier = Modifier.padding(top = 8.dp),
       )
-      Text(
-        text = "BASE",
-        color = AccentGold,
-        fontFamily = RomanTitleFont,
-        fontSize = 21.sp,
-        letterSpacing = 2.sp,
-        lineHeight = 20.sp,
-      )
-    }
 
-    // Phase label + dial, centred on the screen.
-    Column(
-      modifier = Modifier.align(Alignment.Center).fillMaxWidth().offset(y = (-28).dp),
-      horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-      PhaseHeader(state = state, color = phaseColor)
-      Spacer(Modifier.height(24.dp))
-      TimerDial(state = state, color = phaseColor, progress = ringProgress)
-    }
+      // Phase label + dial, centred in the space between title and controls.
+      BoxWithConstraints(
+        modifier = Modifier.weight(1f).fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+      ) {
+        val dialSize = minOf(maxWidth.value, (maxHeight.value - 150f).coerceAtLeast(170f)).dp
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+          PhaseHeader(state = state, color = phaseColor)
+          Spacer(Modifier.height(18.dp))
+          TimerDial(state = state, color = phaseColor, progress = ringProgress, size = dialSize)
+        }
+      }
 
-    // Controls, pinned to the bottom edge.
-    Column(
-      modifier =
-        Modifier.align(Alignment.BottomCenter)
-          .fillMaxWidth()
-          .safeDrawingPadding()
-          .padding(horizontal = 24.dp, vertical = 8.dp),
-      horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+      // Controls + links, pinned to the bottom.
       Controls(state = state)
       Spacer(Modifier.height(10.dp))
       Row(
@@ -174,6 +158,7 @@ fun TimerScreen(
         BottomLink("Trainings", onOpenTrainings)
         BottomLink("Settings", onOpenSettings)
       }
+      Spacer(Modifier.height(4.dp))
     }
   }
 }
@@ -289,12 +274,12 @@ private fun ParamChip(
 }
 
 @Composable
-private fun TimerDial(state: TimerState, color: Color, progress: Float) {
-  Box(modifier = Modifier.size(340.dp), contentAlignment = Alignment.Center) {
+private fun TimerDial(state: TimerState, color: Color, progress: Float, size: Dp) {
+  Box(modifier = Modifier.size(size), contentAlignment = Alignment.Center) {
     Canvas(modifier = Modifier.fillMaxSize()) {
-      val stroke = 20.dp.toPx()
+      val stroke = this.size.minDimension * 0.058f
       val inset = stroke / 2f
-      val arcSize = Size(size.width - stroke, size.height - stroke)
+      val arcSize = Size(this.size.width - stroke, this.size.height - stroke)
       val topLeft = Offset(inset, inset)
       drawArc(
         color = Surface2,
@@ -316,9 +301,9 @@ private fun TimerDial(state: TimerState, color: Color, progress: Float) {
       )
 
       // Half-way marker on the ring (180 degrees from the top).
-      val radius = (size.minDimension - stroke) / 2f
-      val cx = size.width / 2f
-      val cy = size.height / 2f
+      val radius = (this.size.minDimension - stroke) / 2f
+      val cx = this.size.width / 2f
+      val cy = this.size.height / 2f
       val halfAngle = Math.toRadians(90.0) // -90° (top) + 180° sweep
       val dirX = kotlin.math.cos(halfAngle).toFloat()
       val dirY = kotlin.math.sin(halfAngle).toFloat()
@@ -333,7 +318,7 @@ private fun TimerDial(state: TimerState, color: Color, progress: Float) {
     Text(
       text = formatMillis(state.remainingMillis),
       color = color,
-      fontSize = 96.sp,
+      fontSize = (size.value * 0.28f).sp,
       fontWeight = FontWeight.Bold,
       fontFamily = FontFamily.Monospace,
     )
