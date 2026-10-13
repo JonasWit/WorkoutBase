@@ -37,6 +37,20 @@ class SettingsRepository(context: Context) {
     dataStore.edit { it.applyConfig(config) }
   }
 
+  /**
+   * One-time migration: the "beep N seconds before the round ends" warning used
+   * to be on by default. Turn it off for existing installs so only the 3-2-1
+   * countdown is heard, while still letting the user re-enable it in Settings.
+   */
+  suspend fun applyMigrations() {
+    dataStore.edit { prefs ->
+      if (prefs[KEY_MIGRATION_WARN_OFF] != true) {
+        prefs[KEY_MIGRATION_WARN_OFF] = true
+        prefs[KEY_WARN_ENABLED] = false
+      }
+    }
+  }
+
   /** Stores [preset] if there is room; returns false when the limit is reached. */
   suspend fun addPreset(preset: TrainingPreset): Boolean {
     var added = false
@@ -170,6 +184,7 @@ class SettingsRepository(context: Context) {
     val KEY_VIBRATION = booleanPreferencesKey("vibration")
     val KEY_SOUND = booleanPreferencesKey("sound")
     val KEY_PRESET_COUNT = intPreferencesKey("preset_count")
+    val KEY_MIGRATION_WARN_OFF = booleanPreferencesKey("migration_warn_off_v1")
 
     fun pName(index: Int) = stringPreferencesKey("preset_" + index + "_name")
     fun pRounds(index: Int) = intPreferencesKey("preset_" + index + "_rounds")

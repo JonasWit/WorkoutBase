@@ -29,6 +29,7 @@ class WorkoutBaseApp : Application() {
     AppGraph.init(this)
     TimerController.cuePlayer = AndroidCuePlayer(this)
     scope.launch {
+      AppGraph.settings.applyMigrations()
       val config = AppGraph.settings.config.first()
       TimerController.configure(config)
     }

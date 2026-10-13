@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -91,8 +90,6 @@ fun TimerScreen(
       PhaseHeader(state = state, color = phaseColor)
       Spacer(Modifier.height(24.dp))
       TimerDial(state = state, color = phaseColor, progress = ringProgress)
-      Spacer(Modifier.height(24.dp))
-      AdjustRow()
       Spacer(Modifier.weight(1f))
       Controls(state = state)
       Spacer(Modifier.height(8.dp))
@@ -170,14 +167,6 @@ private fun TimerDial(state: TimerState, color: Color, progress: Float) {
       fontWeight = FontWeight.Bold,
       fontFamily = FontFamily.Monospace,
     )
-  }
-}
-
-@Composable
-private fun AdjustRow() {
-  Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-    FilledTonalButton(onClick = { TimerController.adjust(-15_000L) }) { Text("-15s") }
-    FilledTonalButton(onClick = { TimerController.adjust(15_000L) }) { Text("+15s") }
   }
 }
 

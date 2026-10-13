@@ -44,7 +44,7 @@ data class TimerConfig(
   val warnMillis: Long = 10_000L,
   val countdownSeconds: Int = 3,
   val halfWayEnabled: Boolean = true,
-  val warnEnabled: Boolean = true,
+  val warnEnabled: Boolean = false,
   val countdownEnabled: Boolean = true,
   val vibrationEnabled: Boolean = true,
   val soundEnabled: Boolean = true,
