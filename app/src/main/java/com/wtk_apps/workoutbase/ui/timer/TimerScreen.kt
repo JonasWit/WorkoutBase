@@ -34,7 +34,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -123,7 +122,7 @@ fun TimerScreen(
     ) {
       Text("WorkoutBase", color = TextPrimary, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
       Spacer(Modifier.weight(1f))
-      TextButton(onClick = onOpenSettings) { Text("Settings", color = TextSecondary) }
+      BottomLink("Settings", onOpenSettings)
     }
 
     // Phase label + dial, centred on the screen.
