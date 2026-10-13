@@ -55,6 +55,7 @@ import com.wtk_apps.workoutbase.theme.WorkRedOrange
 import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.timer.TimerController
 import com.wtk_apps.workoutbase.timer.formatMillis
+import com.wtk_apps.workoutbase.timer.totalSessionMillis
 import kotlinx.coroutines.launch
 
 @Composable
@@ -266,7 +267,18 @@ private fun PresetRow(preset: TrainingPreset, onClick: () -> Unit) {
         .clickable(onClick = onClick)
         .padding(horizontal = 14.dp, vertical = 14.dp),
   ) {
-    Text(preset.name, color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+      Text(preset.name, color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, modifier = Modifier.weight(1f))
+      Column(horizontalAlignment = Alignment.End) {
+        Text("TOTAL", color = TextSecondary, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
+        Text(
+          formatMillis(totalSessionMillis(config)),
+          color = AccentGold,
+          fontSize = 13.sp,
+          fontWeight = FontWeight.Bold,
+        )
+      }
+    }
     Spacer(Modifier.height(9.dp))
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
       DetailChip("ROUNDS", config.rounds.toString(), AccentGold, Modifier.weight(1f))

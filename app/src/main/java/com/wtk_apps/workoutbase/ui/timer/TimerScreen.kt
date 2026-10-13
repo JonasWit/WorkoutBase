@@ -78,6 +78,8 @@ import com.wtk_apps.workoutbase.timer.TimerPhase
 import com.wtk_apps.workoutbase.timer.TimerState
 import com.wtk_apps.workoutbase.timer.formatMillis
 import com.wtk_apps.workoutbase.timer.label
+import com.wtk_apps.workoutbase.timer.totalRemainingMillis
+import com.wtk_apps.workoutbase.timer.totalSessionMillis
 
 /** Roman-inscription style typeface used for the app title. */
 private val RomanTitleFont = FontFamily(Font(R.font.cinzel))
@@ -216,6 +218,24 @@ private fun PhaseHeader(state: TimerState, color: Color) {
       color = TextSecondary,
       fontSize = 14.sp,
       letterSpacing = 3.sp,
+    )
+  }
+  Spacer(Modifier.height(8.dp))
+  Row(verticalAlignment = Alignment.CenterVertically) {
+    Text("TOTAL ", color = TextSecondary, fontSize = 11.sp, letterSpacing = 1.sp)
+    Text(
+      text = formatMillis(totalSessionMillis(state.config)),
+      color = TextPrimary,
+      fontSize = 13.sp,
+      fontWeight = FontWeight.SemiBold,
+    )
+    Spacer(Modifier.width(14.dp))
+    Text("LEFT ", color = TextSecondary, fontSize = 11.sp, letterSpacing = 1.sp)
+    Text(
+      text = formatMillis(totalRemainingMillis(state)),
+      color = AccentGold,
+      fontSize = 13.sp,
+      fontWeight = FontWeight.Bold,
     )
   }
 }
