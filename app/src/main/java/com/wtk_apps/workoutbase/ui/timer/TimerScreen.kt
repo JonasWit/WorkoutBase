@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -266,7 +267,13 @@ private fun Controls(state: TimerState) {
     horizontalArrangement = Arrangement.spacedBy(12.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    OutlinedButton(onClick = { TimerController.reset() }) { Text("Reset") }
+    OutlinedButton(
+      onClick = { TimerController.reset() },
+      modifier = Modifier.width(92.dp),
+      contentPadding = PaddingValues(horizontal = 8.dp),
+    ) {
+      Text("Reset", maxLines = 1, softWrap = false)
+    }
     val primaryLabel =
       when {
         state.running -> "PAUSE"
@@ -289,7 +296,13 @@ private fun Controls(state: TimerState) {
         softWrap = false,
       )
     }
-    OutlinedButton(onClick = { TimerController.skip() }) { Text("Skip") }
+    OutlinedButton(
+      onClick = { TimerController.skip() },
+      modifier = Modifier.width(92.dp),
+      contentPadding = PaddingValues(horizontal = 8.dp),
+    ) {
+      Text("Skip", maxLines = 1, softWrap = false)
+    }
   }
 }
 

@@ -37,6 +37,14 @@ class SettingsRepository(context: Context) {
     dataStore.edit { it.applyConfig(config) }
   }
 
+  /** Overwrites the saved training at [index]. */
+  suspend fun updatePreset(index: Int, preset: TrainingPreset) {
+    dataStore.edit { prefs ->
+      val count = (prefs[KEY_PRESET_COUNT] ?: 0).coerceIn(0, MAX_PRESETS)
+      if (index in 0 until count) prefs.writePreset(index, preset)
+    }
+  }
+
   /** Stores [preset] if there is room; returns false when the limit is reached. */
   suspend fun addPreset(preset: TrainingPreset): Boolean {
     var added = false

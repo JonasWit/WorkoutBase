@@ -47,20 +47,22 @@ import com.wtk_apps.workoutbase.theme.PrepareBlue
 import com.wtk_apps.workoutbase.theme.RestGreen
 import com.wtk_apps.workoutbase.theme.Surface1
 import com.wtk_apps.workoutbase.theme.Surface2
-import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
+import com.wtk_apps.workoutbase.theme.WorkRedOrange
+import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.timer.TimerController
 import com.wtk_apps.workoutbase.timer.formatMillis
 import kotlinx.coroutines.launch
 
 @Composable
-fun TrainingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun TrainingsScreen(onBack: () -> Unit, onEdit: (Int) -> Unit, modifier: Modifier = Modifier) {
   val scope = rememberCoroutineScope()
   val presets by AppGraph.settings.presets.collectAsStateWithLifecycle(initialValue = emptyList())
-  var showDialog by remember { mutableStateOf(false) }
+  var showSaveDialog by remember { mutableStateOf(false) }
   var nameInput by remember { mutableStateOf("") }
   var limitReached by remember { mutableStateOf(false) }
+  var actionsFor by remember { mutableStateOf<Int?>(null) }
 
   Column(
     modifier = modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp),
@@ -78,7 +80,7 @@ fun TrainingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
     Button(
       onClick = {
         nameInput = "Workout ${presets.size + 1}"
-        showDialog = true
+        showSaveDialog = true
       },
       enabled = presets.size < MAX_PRESETS,
       modifier = Modifier.fillMaxWidth().height(52.dp),
@@ -97,24 +99,14 @@ fun TrainingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
       Text("No saved trainings yet. Configure the timer, then save it here.", color = TextSecondary)
     }
     presets.forEachIndexed { index, preset ->
-      PresetRow(
-        preset = preset,
-        onLoad = {
-          scope.launch {
-            AppGraph.settings.save(preset.config)
-            TimerController.configure(preset.config)
-          }
-          onBack()
-        },
-        onDelete = { scope.launch { AppGraph.settings.deletePreset(index) } },
-      )
+      PresetRow(preset = preset, onClick = { actionsFor = index })
       Spacer(Modifier.height(10.dp))
     }
   }
 
-  if (showDialog) {
+  if (showSaveDialog) {
     AlertDialog(
-      onDismissRequest = { showDialog = false },
+      onDismissRequest = { showSaveDialog = false },
       title = { Text("Save training") },
       text = {
         OutlinedTextField(
@@ -131,25 +123,72 @@ fun TrainingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             val added = AppGraph.settings.addPreset(TrainingPreset(name, TimerController.state.value.config))
             limitReached = !added
           }
-          showDialog = false
+          showSaveDialog = false
         }) {
           Text("Save")
         }
       },
-      dismissButton = { TextButton(onClick = { showDialog = false }) { Text("Cancel") } },
+      dismissButton = { TextButton(onClick = { showSaveDialog = false }) { Text("Cancel") } },
+    )
+  }
+
+  val actionIndex = actionsFor
+  if (actionIndex != null) {
+    val preset = presets.getOrNull(actionIndex)
+    AlertDialog(
+      onDismissRequest = { actionsFor = null },
+      title = { Text(preset?.name ?: "Training") },
+      text = {
+        Column {
+          TextButton(
+            onClick = {
+              preset?.let {
+                scope.launch {
+                  AppGraph.settings.save(it.config)
+                  TimerController.configure(it.config)
+                }
+                onBack()
+              }
+              actionsFor = null
+            },
+            modifier = Modifier.fillMaxWidth(),
+          ) {
+            Text("LOAD", color = AccentGold, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+          }
+          TextButton(
+            onClick = {
+              actionsFor = null
+              onEdit(actionIndex)
+            },
+            modifier = Modifier.fillMaxWidth(),
+          ) {
+            Text("EDIT", color = TextPrimary, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+          }
+          TextButton(
+            onClick = {
+              actionsFor = null
+              scope.launch { AppGraph.settings.deletePreset(actionIndex) }
+            },
+            modifier = Modifier.fillMaxWidth(),
+          ) {
+            Text("DELETE", color = WorkRedOrange, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+          }
+        }
+      },
+      confirmButton = { TextButton(onClick = { actionsFor = null }) { Text("Cancel") } },
     )
   }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun PresetRow(preset: TrainingPreset, onLoad: () -> Unit, onDelete: () -> Unit) {
+private fun PresetRow(preset: TrainingPreset, onClick: () -> Unit) {
   val config = preset.config
   Row(
     modifier =
       Modifier.fillMaxWidth()
         .background(Surface1, RoundedCornerShape(16.dp))
-        .clickable(onClick = onLoad)
+        .clickable(onClick = onClick)
         .padding(horizontal = 16.dp, vertical = 14.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
@@ -169,10 +208,7 @@ private fun PresetRow(preset: TrainingPreset, onLoad: () -> Unit, onDelete: () -
       }
     }
     Spacer(Modifier.width(10.dp))
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-      Text("LOAD", color = AccentGold, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-      TextButton(onClick = onDelete) { Text("✕", color = TextSecondary, fontSize = 16.sp) }
-    }
+    Text("⋯", color = TextSecondary, fontSize = 22.sp)
   }
 }
 

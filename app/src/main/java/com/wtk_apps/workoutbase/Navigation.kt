@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.wtk_apps.workoutbase.ui.settings.SettingsScreen
 import com.wtk_apps.workoutbase.ui.timer.TimerScreen
+import com.wtk_apps.workoutbase.ui.trainings.EditTrainingScreen
 import com.wtk_apps.workoutbase.ui.trainings.TrainingsScreen
 
 @Composable
@@ -32,7 +33,8 @@ fun MainNavigation() {
           )
         }
         entry<Settings> { SettingsScreen(onBack = pop) }
-        entry<Trainings> { TrainingsScreen(onBack = pop) }
+        entry<Trainings> { TrainingsScreen(onBack = pop, onEdit = { index -> backStack.add(EditTraining(index)) }) }
+        entry<EditTraining> { key -> EditTrainingScreen(index = key.index, onBack = pop) }
       },
   )
 }
