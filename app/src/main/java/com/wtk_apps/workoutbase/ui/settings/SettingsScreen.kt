@@ -77,14 +77,10 @@ fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
 
     Spacer(Modifier.height(16.dp))
     SectionTitle("Cues")
-    NumberSetting("Warning (s)", (config.warnMillis / 1000).toInt(), step = 5, range = 0..600) {
-      config = config.copy(warnMillis = it * 1000L)
-    }
     NumberSetting("Countdown (s)", config.countdownSeconds, step = 1, range = 0..10) {
       config = config.copy(countdownSeconds = it)
     }
     Toggle("Half-way cue", config.halfWayEnabled) { config = config.copy(halfWayEnabled = it) }
-    Toggle("Warning cue", config.warnEnabled) { config = config.copy(warnEnabled = it) }
     Toggle("Countdown cue", config.countdownEnabled) { config = config.copy(countdownEnabled = it) }
     Toggle("Sound", config.soundEnabled) { config = config.copy(soundEnabled = it) }
     Toggle("Vibration", config.vibrationEnabled) { config = config.copy(vibrationEnabled = it) }

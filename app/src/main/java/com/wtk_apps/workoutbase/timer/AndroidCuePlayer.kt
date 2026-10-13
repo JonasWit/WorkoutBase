@@ -68,14 +68,6 @@ class AndroidCuePlayer(context: Context) : CuePlayer {
         sound(beepId, config)
         vibrate(120L, config)
       }
-      TimerCue.WARN -> {
-        vibrate(120L, config)
-        scope.launch {
-          sound(beepId, config)
-          delay(220L)
-          sound(beepId, config)
-        }
-      }
       TimerCue.COUNTDOWN -> {
         sound(beepId, config)
         vibrate(80L, config)

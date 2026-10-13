@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
@@ -81,16 +82,40 @@ fun TimerScreen(
 
   Box(modifier = modifier.fillMaxSize()) {
     BreathingGlow(color = phaseColor, active = state.running)
+
+    // Top bar, pinned to the top edge.
+    Row(
+      modifier =
+        Modifier.align(Alignment.TopCenter)
+          .fillMaxWidth()
+          .safeDrawingPadding()
+          .padding(horizontal = 24.dp, vertical = 8.dp),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text("WorkoutBase", color = TextPrimary, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+      Spacer(Modifier.weight(1f))
+      TextButton(onClick = onOpenSettings) { Text("Settings", color = TextSecondary) }
+    }
+
+    // Phase label + dial, centred on the screen.
     Column(
-      modifier = Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 24.dp, vertical = 16.dp),
+      modifier = Modifier.align(Alignment.Center).offset(y = (-28).dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      TopBar(onOpenSettings = onOpenSettings)
-      Spacer(Modifier.height(24.dp))
       PhaseHeader(state = state, color = phaseColor)
       Spacer(Modifier.height(24.dp))
       TimerDial(state = state, color = phaseColor, progress = ringProgress)
-      Spacer(Modifier.weight(1f))
+    }
+
+    // Controls, pinned to the bottom edge.
+    Column(
+      modifier =
+        Modifier.align(Alignment.BottomCenter)
+          .fillMaxWidth()
+          .safeDrawingPadding()
+          .padding(horizontal = 24.dp, vertical = 8.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
       Controls(state = state)
       Spacer(Modifier.height(8.dp))
       Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -102,15 +127,6 @@ fun TimerScreen(
         }
       }
     }
-  }
-}
-
-@Composable
-private fun TopBar(onOpenSettings: () -> Unit) {
-  Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-    Text("WorkoutBase", color = TextPrimary, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
-    Spacer(Modifier.weight(1f))
-    TextButton(onClick = onOpenSettings) { Text("Settings", color = TextSecondary) }
   }
 }
 

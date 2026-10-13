@@ -19,18 +19,14 @@ class TimerEngineTest {
     workMillis: Long = 10_000L,
     restMillis: Long = 5_000L,
     prepareMillis: Long = 0L,
-    warnMillis: Long = 3_000L,
     halfWayEnabled: Boolean = true,
-    warnEnabled: Boolean = true,
     countdownEnabled: Boolean = true,
   ) = TimerConfig(
     rounds = rounds,
     workMillis = workMillis,
     restMillis = restMillis,
     prepareMillis = prepareMillis,
-    warnMillis = warnMillis,
     halfWayEnabled = halfWayEnabled,
-    warnEnabled = warnEnabled,
     countdownEnabled = countdownEnabled,
     countdownSeconds = 3,
     vibrationEnabled = true,
@@ -109,15 +105,6 @@ class TimerEngineTest {
     val transition = TimerEngine.tick(started, 5_000L)
     assertEquals(5_000L, transition.state.remainingMillis)
     assertTrue(transition.cues.contains(TimerCue.HALF_WAY))
-  }
-
-  @Test
-  fun workRound_emitsWarnCueNearEnd() {
-    val started = TimerEngine.start(TimerEngine.initialState(config())).state
-    val half = TimerEngine.tick(started, 5_000L).state
-    val transition = TimerEngine.tick(half, 3_000L)
-    assertEquals(2_000L, transition.state.remainingMillis)
-    assertTrue(transition.cues.contains(TimerCue.WARN))
   }
 
   @Test

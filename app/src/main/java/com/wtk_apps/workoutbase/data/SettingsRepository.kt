@@ -37,20 +37,6 @@ class SettingsRepository(context: Context) {
     dataStore.edit { it.applyConfig(config) }
   }
 
-  /**
-   * One-time migration: the "beep N seconds before the round ends" warning used
-   * to be on by default. Turn it off for existing installs so only the 3-2-1
-   * countdown is heard, while still letting the user re-enable it in Settings.
-   */
-  suspend fun applyMigrations() {
-    dataStore.edit { prefs ->
-      if (prefs[KEY_MIGRATION_WARN_OFF] != true) {
-        prefs[KEY_MIGRATION_WARN_OFF] = true
-        prefs[KEY_WARN_ENABLED] = false
-      }
-    }
-  }
-
   /** Stores [preset] if there is room; returns false when the limit is reached. */
   suspend fun addPreset(preset: TrainingPreset): Boolean {
     var added = false
@@ -91,10 +77,8 @@ class SettingsRepository(context: Context) {
       workMillis = (this[KEY_WORK_SEC] ?: defaults.seconds(defaults.workMillis)).coerceIn(1, 3_600) * 1_000L,
       restMillis = (this[KEY_REST_SEC] ?: defaults.seconds(defaults.restMillis)).coerceIn(0, 3_600) * 1_000L,
       prepareMillis = (this[KEY_PREPARE_SEC] ?: defaults.seconds(defaults.prepareMillis)).coerceIn(0, 600) * 1_000L,
-      warnMillis = (this[KEY_WARN_SEC] ?: defaults.seconds(defaults.warnMillis)).coerceIn(0, 600) * 1_000L,
       countdownSeconds = (this[KEY_COUNTDOWN_SEC] ?: defaults.countdownSeconds).coerceIn(0, 10),
       halfWayEnabled = this[KEY_HALF_WAY] ?: defaults.halfWayEnabled,
-      warnEnabled = this[KEY_WARN_ENABLED] ?: defaults.warnEnabled,
       countdownEnabled = this[KEY_COUNTDOWN_ENABLED] ?: defaults.countdownEnabled,
       vibrationEnabled = this[KEY_VIBRATION] ?: defaults.vibrationEnabled,
       soundEnabled = this[KEY_SOUND] ?: defaults.soundEnabled,
@@ -105,10 +89,8 @@ class SettingsRepository(context: Context) {
     this[KEY_WORK_SEC] = config.seconds(config.workMillis)
     this[KEY_REST_SEC] = config.seconds(config.restMillis)
     this[KEY_PREPARE_SEC] = config.seconds(config.prepareMillis)
-    this[KEY_WARN_SEC] = config.seconds(config.warnMillis)
     this[KEY_COUNTDOWN_SEC] = config.countdownSeconds
     this[KEY_HALF_WAY] = config.halfWayEnabled
-    this[KEY_WARN_ENABLED] = config.warnEnabled
     this[KEY_COUNTDOWN_ENABLED] = config.countdownEnabled
     this[KEY_VIBRATION] = config.vibrationEnabled
     this[KEY_SOUND] = config.soundEnabled
@@ -126,10 +108,8 @@ class SettingsRepository(context: Context) {
             workMillis = (this[pWork(index)] ?: defaults.seconds(defaults.workMillis)).coerceIn(1, 3_600) * 1_000L,
             restMillis = (this[pRest(index)] ?: defaults.seconds(defaults.restMillis)).coerceIn(0, 3_600) * 1_000L,
             prepareMillis = (this[pPrepare(index)] ?: defaults.seconds(defaults.prepareMillis)).coerceIn(0, 600) * 1_000L,
-            warnMillis = (this[pWarn(index)] ?: defaults.seconds(defaults.warnMillis)).coerceIn(0, 600) * 1_000L,
             countdownSeconds = (this[pCountdown(index)] ?: defaults.countdownSeconds).coerceIn(0, 10),
             halfWayEnabled = this[pHalfWay(index)] ?: defaults.halfWayEnabled,
-            warnEnabled = this[pWarnEnabled(index)] ?: defaults.warnEnabled,
             countdownEnabled = this[pCountdownEnabled(index)] ?: defaults.countdownEnabled,
             vibrationEnabled = this[pVibration(index)] ?: defaults.vibrationEnabled,
             soundEnabled = this[pSound(index)] ?: defaults.soundEnabled,
@@ -145,10 +125,8 @@ class SettingsRepository(context: Context) {
     this[pWork(index)] = preset.config.seconds(preset.config.workMillis)
     this[pRest(index)] = preset.config.seconds(preset.config.restMillis)
     this[pPrepare(index)] = preset.config.seconds(preset.config.prepareMillis)
-    this[pWarn(index)] = preset.config.seconds(preset.config.warnMillis)
     this[pCountdown(index)] = preset.config.countdownSeconds
     this[pHalfWay(index)] = preset.config.halfWayEnabled
-    this[pWarnEnabled(index)] = preset.config.warnEnabled
     this[pCountdownEnabled(index)] = preset.config.countdownEnabled
     this[pVibration(index)] = preset.config.vibrationEnabled
     this[pSound(index)] = preset.config.soundEnabled
@@ -160,10 +138,8 @@ class SettingsRepository(context: Context) {
     remove(pWork(index))
     remove(pRest(index))
     remove(pPrepare(index))
-    remove(pWarn(index))
     remove(pCountdown(index))
     remove(pHalfWay(index))
-    remove(pWarnEnabled(index))
     remove(pCountdownEnabled(index))
     remove(pVibration(index))
     remove(pSound(index))
@@ -176,25 +152,20 @@ class SettingsRepository(context: Context) {
     val KEY_WORK_SEC = intPreferencesKey("work_seconds")
     val KEY_REST_SEC = intPreferencesKey("rest_seconds")
     val KEY_PREPARE_SEC = intPreferencesKey("prepare_seconds")
-    val KEY_WARN_SEC = intPreferencesKey("warn_seconds")
     val KEY_COUNTDOWN_SEC = intPreferencesKey("countdown_seconds")
     val KEY_HALF_WAY = booleanPreferencesKey("half_way")
-    val KEY_WARN_ENABLED = booleanPreferencesKey("warn_enabled")
     val KEY_COUNTDOWN_ENABLED = booleanPreferencesKey("countdown_enabled")
     val KEY_VIBRATION = booleanPreferencesKey("vibration")
     val KEY_SOUND = booleanPreferencesKey("sound")
     val KEY_PRESET_COUNT = intPreferencesKey("preset_count")
-    val KEY_MIGRATION_WARN_OFF = booleanPreferencesKey("migration_warn_off_v1")
 
     fun pName(index: Int) = stringPreferencesKey("preset_" + index + "_name")
     fun pRounds(index: Int) = intPreferencesKey("preset_" + index + "_rounds")
     fun pWork(index: Int) = intPreferencesKey("preset_" + index + "_work")
     fun pRest(index: Int) = intPreferencesKey("preset_" + index + "_rest")
     fun pPrepare(index: Int) = intPreferencesKey("preset_" + index + "_prepare")
-    fun pWarn(index: Int) = intPreferencesKey("preset_" + index + "_warn")
     fun pCountdown(index: Int) = intPreferencesKey("preset_" + index + "_countdown")
     fun pHalfWay(index: Int) = booleanPreferencesKey("preset_" + index + "_halfway")
-    fun pWarnEnabled(index: Int) = booleanPreferencesKey("preset_" + index + "_warn_enabled")
     fun pCountdownEnabled(index: Int) = booleanPreferencesKey("preset_" + index + "_countdown_enabled")
     fun pVibration(index: Int) = booleanPreferencesKey("preset_" + index + "_vibration")
     fun pSound(index: Int) = booleanPreferencesKey("preset_" + index + "_sound")

@@ -23,8 +23,6 @@ enum class TimerCue {
   WORK_END,
   /** Beep at the half-way point of a work round. */
   HALF_WAY,
-  /** Warning beep a configured number of seconds before the work round ends. */
-  WARN,
   /** Short beep for each of the final countdown seconds. */
   COUNTDOWN,
   /** Final celebration gong when the whole session ends. */
@@ -41,10 +39,8 @@ data class TimerConfig(
   val workMillis: Long = 180_000L,
   val restMillis: Long = 60_000L,
   val prepareMillis: Long = 10_000L,
-  val warnMillis: Long = 10_000L,
   val countdownSeconds: Int = 3,
   val halfWayEnabled: Boolean = true,
-  val warnEnabled: Boolean = false,
   val countdownEnabled: Boolean = true,
   val vibrationEnabled: Boolean = true,
   val soundEnabled: Boolean = true,
@@ -54,7 +50,6 @@ data class TimerConfig(
     require(workMillis > 0L) { "workMillis must be positive" }
     require(restMillis >= 0L) { "restMillis must not be negative" }
     require(prepareMillis >= 0L) { "prepareMillis must not be negative" }
-    require(warnMillis >= 0L) { "warnMillis must not be negative" }
     require(countdownSeconds >= 0) { "countdownSeconds must not be negative" }
   }
 }
@@ -232,9 +227,6 @@ object TimerEngine {
       val half = state.phaseMillis / 2L
       if (config.halfWayEnabled && half > 0L && beforeMillis > half && afterMillis <= half) {
         cues += TimerCue.HALF_WAY
-      }
-      if (config.warnEnabled && config.warnMillis > 0L && beforeMillis > config.warnMillis && afterMillis <= config.warnMillis) {
-        cues += TimerCue.WARN
       }
     }
 
