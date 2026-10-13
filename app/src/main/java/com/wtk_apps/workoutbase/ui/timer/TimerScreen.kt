@@ -323,7 +323,7 @@ float noise(float2 p) {
   float b = hash21(i + float2(1.0, 0.0));
   float c = hash21(i + float2(0.0, 1.0));
   float d = hash21(i + float2(1.0, 1.0));
-  float2 u = f * f * (3.0 - 2.0 * f);
+  float2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);   // quintic (fewer axis artifacts)
   return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 
@@ -344,10 +344,12 @@ half4 main(float2 fragCoord) {
   uv.y = 1.0 - uv.y;                       // y = 0 at the bottom
   float aspect = uResolution.x / uResolution.y;
 
-  float2 p = float2(uv.x * aspect * 2.6, uv.y * 3.2);
-  p.y -= uTime * 1.35;                      // flames rise
-  float warp = fbm(p * 0.8 + float2(0.0, uTime * 0.5));
-  float n = fbm(p + float2(warp * 1.3, 0.0));
+  float2 p = float2(uv.x * aspect * 2.4, uv.y * 3.0);
+  p.y -= uTime * 1.2;                       // flames rise
+  // Turbulence in both axes so the pattern never forms horizontal bands.
+  float wx = noise(p * 0.6 + float2(uTime * 0.30, 0.0));
+  float wy = noise(p * 0.6 + float2(0.0, uTime * 0.45) + 31.0);
+  float n = fbm(p + float2((wx - 0.5) * 1.7, (wy - 0.5) * 1.3));
 
   // Fire hugs the bottom edge and fades out towards the top.
   float heightMask = smoothstep(0.9, 0.05, uv.y);
