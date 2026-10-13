@@ -126,7 +126,7 @@ fun TimerScreen(
     ) {
       // Roman title, single line.
       Text(
-        text = "WORKOUTBASE",
+        text = "WORKOUT BASE",
         color = AccentGold,
         fontFamily = RomanTitleFont,
         fontSize = 22.sp,
