@@ -116,35 +116,31 @@ fun TimerScreen(
   Box(modifier = modifier.fillMaxSize()) {
     FlameBackground(color = phaseColor, speed = flameSpeed)
 
-    // Top bar, pinned to the top edge.
-    Row(
+    // Centred Roman title.
+    Column(
       modifier =
         Modifier.align(Alignment.TopCenter)
           .fillMaxWidth()
           .safeDrawingPadding()
-          .padding(horizontal = 24.dp, vertical = 8.dp),
-      verticalAlignment = Alignment.CenterVertically,
+          .padding(top = 10.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-          text = "WORKOUT",
-          color = AccentGold,
-          fontFamily = RomanTitleFont,
-          fontSize = 21.sp,
-          letterSpacing = 2.sp,
-          lineHeight = 20.sp,
-        )
-        Text(
-          text = "BASE",
-          color = AccentGold,
-          fontFamily = RomanTitleFont,
-          fontSize = 21.sp,
-          letterSpacing = 2.sp,
-          lineHeight = 20.sp,
-        )
-      }
-      Spacer(Modifier.weight(1f))
-      BottomLink("Settings", onOpenSettings)
+      Text(
+        text = "WORKOUT",
+        color = AccentGold,
+        fontFamily = RomanTitleFont,
+        fontSize = 21.sp,
+        letterSpacing = 2.sp,
+        lineHeight = 20.sp,
+      )
+      Text(
+        text = "BASE",
+        color = AccentGold,
+        fontFamily = RomanTitleFont,
+        fontSize = 21.sp,
+        letterSpacing = 2.sp,
+        lineHeight = 20.sp,
+      )
     }
 
     // Phase label + dial, centred on the screen.
@@ -167,8 +163,15 @@ fun TimerScreen(
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Controls(state = state)
-      Spacer(Modifier.height(8.dp))
-      BottomLink("Trainings", onOpenTrainings)
+      Spacer(Modifier.height(10.dp))
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        BottomLink("Trainings", onOpenTrainings)
+        BottomLink("Settings", onOpenSettings)
+      }
     }
   }
 }
