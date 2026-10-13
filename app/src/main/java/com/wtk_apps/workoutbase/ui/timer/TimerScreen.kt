@@ -17,6 +17,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -255,9 +256,17 @@ private fun Controls(state: TimerState) {
     Button(
       onClick = { TimerController.toggle() },
       modifier = Modifier.weight(1f).height(56.dp),
+      contentPadding = PaddingValues(horizontal = 8.dp),
       colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),
     ) {
-      Text(primaryLabel, fontSize = 18.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+      Text(
+        primaryLabel,
+        fontSize = 17.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 1.sp,
+        maxLines = 1,
+        softWrap = false,
+      )
     }
     OutlinedButton(onClick = { TimerController.skip() }) { Text("Skip") }
   }
@@ -340,14 +349,14 @@ half4 main(float2 fragCoord) {
   float warp = fbm(p * 0.8 + float2(0.0, uTime * 0.5));
   float n = fbm(p + float2(warp * 1.3, 0.0));
 
-  // Large, strong fire rising from the bottom of the screen.
-  float heightMask = smoothstep(1.0, 0.05, uv.y);
-  float fire = pow(n * heightMask, 1.6) * 2.0;
+  // Fire hugs the bottom edge and fades out towards the top.
+  float heightMask = smoothstep(0.9, 0.05, uv.y);
+  float fire = pow(n * heightMask, 1.7) * 1.5;
 
   float t = clamp(fire, 0.0, 1.0);
-  float3 col = uColor * t * 1.6;
-  col += float3(1.0, 0.86, 0.55) * pow(t, 3.0) * 0.7;   // hot core
-  col += float3(0.035, 0.032, 0.03);                     // faint ambient
+  float3 col = uColor * t * 1.2;
+  col += float3(1.0, 0.86, 0.55) * pow(t, 3.0) * 0.5;   // hot core
+  col += float3(0.025, 0.023, 0.02);                     // faint ambient
 
   return half4(col, 1.0);
 }
