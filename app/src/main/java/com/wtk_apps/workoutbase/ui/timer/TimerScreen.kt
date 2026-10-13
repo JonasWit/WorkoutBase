@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -179,9 +180,9 @@ private fun PhaseHeader(state: TimerState, color: Color) {
     horizontalArrangement = Arrangement.spacedBy(6.dp),
   ) {
     ParamChip("ROUNDS", state.config.rounds.toString(), AccentGold, Modifier.weight(1f))
-    ParamChip("WORK", formatMillis(state.config.workMillis), WorkYellow, Modifier.weight(1f))
-    ParamChip("REST", formatMillis(state.config.restMillis), RestGreen, Modifier.weight(1f))
-    ParamChip("PREP", formatMillis(state.config.prepareMillis), PrepareBlue, Modifier.weight(1f))
+    ParamChip("WORK", formatMillis(state.config.workMillis), WorkYellow, Modifier.weight(1f), active = state.phase == TimerPhase.WORK)
+    ParamChip("REST", formatMillis(state.config.restMillis), RestGreen, Modifier.weight(1f), active = state.phase == TimerPhase.REST)
+    ParamChip("PREP", formatMillis(state.config.prepareMillis), PrepareBlue, Modifier.weight(1f), active = state.phase == TimerPhase.PREPARE)
   }
   if (state.round > 0) {
     Spacer(Modifier.height(10.dp))
@@ -194,20 +195,50 @@ private fun PhaseHeader(state: TimerState, color: Color) {
   }
 }
 
-/** Small parameter chip with a border in its phase colour. */
+/** Small parameter chip with a border in its phase colour; the active phase glows. */
 @Composable
-private fun ParamChip(label: String, value: String, accent: Color, modifier: Modifier = Modifier) {
-  Column(
-    modifier =
-      modifier
-        .clip(RoundedCornerShape(9.dp))
-        .background(Surface2.copy(alpha = 0.75f))
-        .border(1.dp, accent.copy(alpha = 0.7f), RoundedCornerShape(9.dp))
-        .padding(horizontal = 6.dp, vertical = 5.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
-  ) {
-    Text(label, color = accent, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
-    Text(value, color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+private fun ParamChip(
+  label: String,
+  value: String,
+  accent: Color,
+  modifier: Modifier = Modifier,
+  active: Boolean = false,
+) {
+  val transition = rememberInfiniteTransition(label = "chip")
+  val pulse by
+    transition.animateFloat(
+      initialValue = 0f,
+      targetValue = 1f,
+      animationSpec = infiniteRepeatable(tween(1300, easing = LinearEasing), RepeatMode.Reverse),
+      label = "chipPulse",
+    )
+
+  val shape = RoundedCornerShape(10.dp)
+  val glowAlpha = if (active) 0.30f + 0.5f * pulse else 0f
+  val borderWidth = if (active) 2.dp else 1.dp
+  val borderAlpha = if (active) 0.75f + 0.25f * pulse else 0.7f
+
+  Box(modifier = modifier) {
+    if (active) {
+      Box(
+        modifier =
+          Modifier.matchParentSize()
+            .border(3.dp, accent.copy(alpha = glowAlpha), shape)
+            .blur(9.dp),
+      )
+    }
+    Column(
+      modifier =
+        Modifier.fillMaxWidth()
+          .clip(shape)
+          .background(Surface2.copy(alpha = if (active) 0.95f else 0.75f))
+          .border(borderWidth, accent.copy(alpha = borderAlpha), shape)
+          .padding(horizontal = 6.dp, vertical = 6.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+      Text(label, color = accent, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
+      Text(value, color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+    }
   }
 }
 
