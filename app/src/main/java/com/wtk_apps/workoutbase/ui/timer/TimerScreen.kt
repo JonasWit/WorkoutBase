@@ -125,13 +125,24 @@ fun TimerScreen(
           .padding(horizontal = 24.dp, vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      Text(
-        text = "WORKOUTBASE",
-        color = AccentGold,
-        fontFamily = RomanTitleFont,
-        fontSize = 21.sp,
-        letterSpacing = 2.sp,
-      )
+      Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+          text = "WORKOUT",
+          color = AccentGold,
+          fontFamily = RomanTitleFont,
+          fontSize = 21.sp,
+          letterSpacing = 2.sp,
+          lineHeight = 20.sp,
+        )
+        Text(
+          text = "BASE",
+          color = AccentGold,
+          fontFamily = RomanTitleFont,
+          fontSize = 21.sp,
+          letterSpacing = 2.sp,
+          lineHeight = 20.sp,
+        )
+      }
       Spacer(Modifier.weight(1f))
       BottomLink("Settings", onOpenSettings)
     }
