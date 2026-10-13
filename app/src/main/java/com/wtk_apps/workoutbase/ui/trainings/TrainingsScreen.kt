@@ -6,8 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -210,49 +207,40 @@ private fun DialogAction(label: String, filled: Boolean, accent: Color, onClick:
   }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PresetRow(preset: TrainingPreset, onClick: () -> Unit) {
   val config = preset.config
-  Row(
+  Column(
     modifier =
       Modifier.fillMaxWidth()
         .background(Surface1, RoundedCornerShape(16.dp))
         .clickable(onClick = onClick)
-        .padding(horizontal = 16.dp, vertical = 14.dp),
-    verticalAlignment = Alignment.CenterVertically,
+        .padding(horizontal = 14.dp, vertical = 14.dp),
   ) {
-    Column(modifier = Modifier.weight(1f)) {
-      Text(preset.name, color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-      Spacer(Modifier.height(9.dp))
-      FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-      ) {
-        DetailChip("ROUNDS", config.rounds.toString(), AccentGold)
-        DetailChip("WORK", formatMillis(config.workMillis), WorkYellow)
-        DetailChip("REST", formatMillis(config.restMillis), RestGreen)
-        if (config.prepareMillis > 0) {
-          DetailChip("PREP", formatMillis(config.prepareMillis), PrepareBlue)
-        }
-      }
+    Text(preset.name, color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+    Spacer(Modifier.height(9.dp))
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+      DetailChip("ROUNDS", config.rounds.toString(), AccentGold, Modifier.weight(1f))
+      DetailChip("WORK", formatMillis(config.workMillis), WorkYellow, Modifier.weight(1f))
+      DetailChip("REST", formatMillis(config.restMillis), RestGreen, Modifier.weight(1f))
+      DetailChip("PREP", formatMillis(config.prepareMillis), PrepareBlue, Modifier.weight(1f))
     }
-    Spacer(Modifier.width(10.dp))
-    Text("⋯", color = TextSecondary, fontSize = 22.sp)
   }
 }
 
 /** Small structured chip with a border in its phase colour. */
 @Composable
-private fun DetailChip(label: String, value: String, accent: Color) {
+private fun DetailChip(label: String, value: String, accent: Color, modifier: Modifier = Modifier) {
   Column(
     modifier =
-      Modifier.clip(RoundedCornerShape(10.dp))
+      modifier
+        .clip(RoundedCornerShape(10.dp))
         .background(Surface2)
         .border(1.dp, accent.copy(alpha = 0.7f), RoundedCornerShape(10.dp))
-        .padding(horizontal = 12.dp, vertical = 6.dp),
+        .padding(horizontal = 6.dp, vertical = 6.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Text(label, color = accent, fontSize = 9.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
-    Text(value, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+    Text(label, color = accent, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
+    Text(value, color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
   }
 }
