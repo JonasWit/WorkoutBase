@@ -11,6 +11,9 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +26,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
@@ -125,15 +130,25 @@ fun TimerScreen(
     ) {
       Controls(state = state)
       Spacer(Modifier.height(8.dp))
-      Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-        TextButton(onClick = onOpenTrainings) {
-          Text("Trainings", color = TextSecondary, letterSpacing = 1.sp)
-        }
-        TextButton(onClick = onOpenStopwatch) {
-          Text("Stopwatch", color = TextSecondary, letterSpacing = 1.sp)
-        }
+      Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        BottomLink("Trainings", onOpenTrainings)
+        BottomLink("Stopwatch", onOpenStopwatch)
       }
     }
+  }
+}
+
+@Composable
+private fun BottomLink(text: String, onClick: () -> Unit) {
+  Box(
+    modifier =
+      Modifier.clip(RoundedCornerShape(50))
+        .background(Color.Black.copy(alpha = 0.6f))
+        .border(1.dp, TextPrimary.copy(alpha = 0.35f), RoundedCornerShape(50))
+        .clickable(onClick = onClick)
+        .padding(horizontal = 20.dp, vertical = 10.dp),
+  ) {
+    Text(text, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
   }
 }
 
