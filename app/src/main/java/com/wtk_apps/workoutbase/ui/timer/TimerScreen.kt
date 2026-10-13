@@ -96,7 +96,7 @@ fun TimerScreen(
       TimerPhase.WORK -> 2.6f
       TimerPhase.PREPARE -> 1.2f
       TimerPhase.REST -> 0.55f
-      TimerPhase.IDLE, TimerPhase.FINISHED -> 0.9f
+      TimerPhase.IDLE, TimerPhase.FINISHED -> 0.8f
     }
   val ringProgress by
     animateFloatAsState(
