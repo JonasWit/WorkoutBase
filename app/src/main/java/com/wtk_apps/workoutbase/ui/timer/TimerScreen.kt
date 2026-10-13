@@ -187,17 +187,18 @@ private fun PhaseHeader(state: TimerState, color: Color) {
 
 @Composable
 private fun TimerDial(state: TimerState, color: Color, progress: Float) {
-  Box(modifier = Modifier.size(300.dp), contentAlignment = Alignment.Center) {
+  Box(modifier = Modifier.size(340.dp), contentAlignment = Alignment.Center) {
     Canvas(modifier = Modifier.fillMaxSize()) {
-      val stroke = 14.dp.toPx()
+      val stroke = 20.dp.toPx()
       val inset = stroke / 2f
-      val arcSize = androidx.compose.ui.geometry.Size(size.width - stroke, size.height - stroke)
+      val arcSize = Size(size.width - stroke, size.height - stroke)
+      val topLeft = Offset(inset, inset)
       drawArc(
         color = Surface2,
         startAngle = -90f,
         sweepAngle = 360f,
         useCenter = false,
-        topLeft = Offset(inset, inset),
+        topLeft = topLeft,
         size = arcSize,
         style = Stroke(width = stroke, cap = StrokeCap.Round),
       )
@@ -206,15 +207,30 @@ private fun TimerDial(state: TimerState, color: Color, progress: Float) {
         startAngle = -90f,
         sweepAngle = 360f * progress,
         useCenter = false,
-        topLeft = Offset(inset, inset),
+        topLeft = topLeft,
         size = arcSize,
         style = Stroke(width = stroke, cap = StrokeCap.Round),
+      )
+
+      // Half-way marker on the ring (180 degrees from the top).
+      val radius = (size.minDimension - stroke) / 2f
+      val cx = size.width / 2f
+      val cy = size.height / 2f
+      val halfAngle = Math.toRadians(90.0) // -90° (top) + 180° sweep
+      val dirX = kotlin.math.cos(halfAngle).toFloat()
+      val dirY = kotlin.math.sin(halfAngle).toFloat()
+      drawLine(
+        color = TextPrimary.copy(alpha = 0.9f),
+        start = Offset(cx + dirX * (radius - stroke * 0.55f), cy + dirY * (radius - stroke * 0.55f)),
+        end = Offset(cx + dirX * (radius + stroke * 0.6f), cy + dirY * (radius + stroke * 0.6f)),
+        strokeWidth = 4.dp.toPx(),
+        cap = StrokeCap.Round,
       )
     }
     Text(
       text = formatMillis(state.remainingMillis),
       color = color,
-      fontSize = 84.sp,
+      fontSize = 96.sp,
       fontWeight = FontWeight.Bold,
       fontFamily = FontFamily.Monospace,
     )
