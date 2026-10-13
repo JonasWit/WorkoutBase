@@ -1,12 +1,13 @@
 package com.wtk_apps.workoutbase.timer
 
 import android.content.Context
-import android.media.AudioManager
-import android.media.ToneGenerator
+import android.media.AudioAttributes
+import android.media.SoundPool
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import com.wtk_apps.workoutbase.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -14,16 +15,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * Playback of timer cues using [ToneGenerator] for tones and the system
- * vibrator for haptics. Sound and vibration can be disabled through
- * [TimerConfig.soundEnabled] / [TimerConfig.vibrationEnabled].
+ * Plays timer cues from bundled raw sounds using [SoundPool] and drives the
+ * system vibrator.
+ *
+ * Sounds are played on the media stream (which users normally keep audible)
+ * rather than the alarm stream, so cues are reliably heard during training.
  */
 class AndroidCuePlayer(context: Context) : CuePlayer {
 
   private val appContext = context.applicationContext
   private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-  private val toneGenerator: ToneGenerator? =
-    runCatching { ToneGenerator(AudioManager.STREAM_ALARM, VOLUME) }.getOrNull()
+
+  private val soundPool: SoundPool
+  private val beepId: Int
+  private val gongId: Int
+  @Volatile private var loaded = false
 
   private val vibrator: Vibrator? =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -32,55 +38,71 @@ class AndroidCuePlayer(context: Context) : CuePlayer {
       @Suppress("DEPRECATION") appContext.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
     }
 
+  init {
+    val attributes =
+      AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_MEDIA)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+        .build()
+    soundPool = SoundPool.Builder().setMaxStreams(MAX_STREAMS).setAudioAttributes(attributes).build()
+    soundPool.setOnLoadCompleteListener { _, _, status -> if (status == 0) loaded = true }
+    beepId = soundPool.load(appContext, R.raw.beep, 1)
+    gongId = soundPool.load(appContext, R.raw.gong, 1)
+  }
+
   override fun play(cue: TimerCue, config: TimerConfig) {
     when (cue) {
       TimerCue.PREPARE_START -> {
-        tone(ToneGenerator.TONE_PROP_BEEP2, 300, config)
+        sound(beepId, config)
         vibrate(120L, config)
       }
       TimerCue.WORK_START -> {
-        gong(config)
+        sound(gongId, config)
         vibrate(400L, config)
       }
       TimerCue.WORK_END -> {
-        gong(config)
+        sound(gongId, config)
         vibrate(400L, config)
       }
       TimerCue.HALF_WAY -> {
-        tone(ToneGenerator.TONE_PROP_BEEP, 200, config)
+        sound(beepId, config)
         vibrate(120L, config)
       }
       TimerCue.WARN -> {
         vibrate(120L, config)
         scope.launch {
-          tone(ToneGenerator.TONE_PROP_BEEP, 160, config)
-          delay(200L)
-          tone(ToneGenerator.TONE_PROP_BEEP, 160, config)
+          sound(beepId, config)
+          delay(220L)
+          sound(beepId, config)
         }
       }
       TimerCue.COUNTDOWN -> {
-        tone(ToneGenerator.TONE_PROP_BEEP, 140, config)
+        sound(beepId, config)
         vibrate(80L, config)
       }
       TimerCue.FINISHED -> {
         vibrate(700L, config)
         scope.launch {
           repeat(3) { index ->
-            gong(config)
-            if (index < 2) delay(650L)
+            sound(gongId, config)
+            if (index < 2) delay(700L)
           }
         }
       }
     }
   }
 
-  private fun gong(config: TimerConfig) {
-    tone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 700, config)
-  }
-
-  private fun tone(tone: Int, durationMs: Int, config: TimerConfig) {
+  private fun sound(soundId: Int, config: TimerConfig) {
     if (!config.soundEnabled) return
-    runCatching { toneGenerator?.startTone(tone, durationMs) }
+    if (loaded) {
+      runCatching { soundPool.play(soundId, VOLUME, VOLUME, 1, 0, 1f) }
+    } else {
+      // The very first cue may arrive before SoundPool finished loading; retry once.
+      scope.launch {
+        delay(150L)
+        if (loaded) runCatching { soundPool.play(soundId, VOLUME, VOLUME, 1, 0, 1f) }
+      }
+    }
   }
 
   private fun vibrate(durationMs: Long, config: TimerConfig) {
@@ -97,6 +119,7 @@ class AndroidCuePlayer(context: Context) : CuePlayer {
   }
 
   private companion object {
-    const val VOLUME = 90
+    const val MAX_STREAMS = 4
+    const val VOLUME = 1.0f
   }
 }

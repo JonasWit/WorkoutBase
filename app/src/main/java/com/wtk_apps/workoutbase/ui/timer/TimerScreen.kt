@@ -61,6 +61,7 @@ import com.wtk_apps.workoutbase.timer.label
 fun TimerScreen(
   onOpenSettings: () -> Unit,
   onOpenStopwatch: () -> Unit,
+  onOpenTrainings: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val state by TimerController.state.collectAsStateWithLifecycle()
@@ -95,8 +96,13 @@ fun TimerScreen(
       Spacer(Modifier.weight(1f))
       Controls(state = state)
       Spacer(Modifier.height(8.dp))
-      TextButton(onClick = onOpenStopwatch) {
-        Text("Stopwatch", color = TextSecondary, letterSpacing = 1.sp)
+      Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+        TextButton(onClick = onOpenTrainings) {
+          Text("Trainings", color = TextSecondary, letterSpacing = 1.sp)
+        }
+        TextButton(onClick = onOpenStopwatch) {
+          Text("Stopwatch", color = TextSecondary, letterSpacing = 1.sp)
+        }
       }
     }
   }
