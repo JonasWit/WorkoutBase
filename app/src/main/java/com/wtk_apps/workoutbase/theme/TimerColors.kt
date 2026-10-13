@@ -4,16 +4,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 
 /**
- * Smooth colour for a work round as it elapses: green at the start, amber in the
- * middle and red at the end. Interpolation happens in HSV space so the midpoints
- * stay vivid instead of turning muddy grey (which plain RGB lerp would produce).
+ * Smooth colour for a work round as it elapses: gold/yellow at the start,
+ * orange in the middle and deep orange-red at the end. Interpolation happens in
+ * HSV space so the midpoints stay vivid instead of turning muddy grey.
  */
 fun workProgressColor(progress: Float): Color {
   val p = progress.coerceIn(0f, 1f)
   return if (p < 0.5f) {
-    lerpHsv(WorkGreen, WorkAmber, p / 0.5f)
+    lerpHsv(WorkYellow, WorkOrange, p / 0.5f)
   } else {
-    lerpHsv(WorkAmber, WorkRed, (p - 0.5f) / 0.5f)
+    lerpHsv(WorkOrange, WorkRedOrange, (p - 0.5f) / 0.5f)
   }
 }
 

@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.wtk_apps.workoutbase.theme.AccentGreen
+import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
 import kotlinx.coroutines.delay
@@ -76,7 +76,7 @@ fun StopwatchScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
         Button(
           onClick = { running = !running },
           modifier = Modifier.weight(1f).height(56.dp),
-          colors = ButtonDefaults.buttonColors(containerColor = AccentGreen),
+          colors = ButtonDefaults.buttonColors(containerColor = AccentGold),
         ) {
           Text(
             if (running) "PAUSE" else "START",

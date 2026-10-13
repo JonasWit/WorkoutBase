@@ -6,11 +6,11 @@ import androidx.compose.runtime.Composable
 
 private val WorkoutColorScheme =
   darkColorScheme(
-    primary = AccentGreen,
+    primary = AccentGold,
     onPrimary = Ink,
-    secondary = RestTeal,
+    secondary = RestOrange,
     onSecondary = Ink,
-    tertiary = PrepareBlue,
+    tertiary = PrepareYellow,
     onTertiary = Ink,
     background = Ink,
     onBackground = TextPrimary,
@@ -21,7 +21,7 @@ private val WorkoutColorScheme =
     outline = Outline1,
   )
 
-/** Fixed, muted dark theme for WorkoutBase. */
+/** Fixed, black-and-gold dark theme for WorkoutBase. */
 @Composable
 fun WorkoutBaseTheme(content: @Composable () -> Unit) {
   MaterialTheme(colorScheme = WorkoutColorScheme, typography = Typography, content = content)

@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextAlign
 import com.wtk_apps.workoutbase.AppGraph
-import com.wtk_apps.workoutbase.theme.AccentGreen
+import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.timer.TimerController
@@ -95,7 +95,7 @@ fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
         }
       },
       modifier = Modifier.fillMaxWidth().height(52.dp),
-      colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = MaterialTheme.colorScheme.onPrimary),
+      colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),
     ) {
       Text("SAVE", fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
     }

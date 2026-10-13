@@ -2,19 +2,19 @@ package com.wtk_apps.workoutbase.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Muted but comfortably bright dark palette used across the app.
-val Ink = Color(0xFF20262F)
-val Surface1 = Color(0xFF2A313B)
-val Surface2 = Color(0xFF363E4A)
-val Outline1 = Color(0xFF454F5C)
-val TextPrimary = Color(0xFFF2F4F7)
-val TextSecondary = Color(0xFFB7C0CC)
+// Black-and-gold palette: near-black backgrounds with gold/yellow/orange accents.
+val Ink = Color(0xFF0A0A0B) // app background (near black)
+val Surface1 = Color(0xFF17171A)
+val Surface2 = Color(0xFF232327)
+val Outline1 = Color(0xFF34343B)
+val TextPrimary = Color(0xFFF3EFE4) // warm off-white
+val TextSecondary = Color(0xFFB9AF9A) // warm grey
 
-val AccentGreen = Color(0xFF7FB893)
+val AccentGold = Color(0xFFD4AF37) // primary accent / buttons
 
-// Timer phase anchors (used for the smooth green -> amber -> red transition).
-val WorkGreen = Color(0xFF5FBE86)
-val WorkAmber = Color(0xFFE6BC48)
-val WorkRed = Color(0xFFD45B50)
-val RestTeal = Color(0xFF52A0B5)
-val PrepareBlue = Color(0xFF7A9CC4)
+// Timer phase anchors (gold -> orange -> deep orange-red as a round elapses).
+val WorkYellow = Color(0xFFF5C542)
+val WorkOrange = Color(0xFFE8862B)
+val WorkRedOrange = Color(0xFFC7431F)
+val RestOrange = Color(0xFFCC8A3A)
+val PrepareYellow = Color(0xFFF0CE6E)

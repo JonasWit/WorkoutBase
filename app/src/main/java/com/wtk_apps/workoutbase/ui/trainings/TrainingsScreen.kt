@@ -36,7 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wtk_apps.workoutbase.AppGraph
 import com.wtk_apps.workoutbase.data.MAX_PRESETS
 import com.wtk_apps.workoutbase.data.TrainingPreset
-import com.wtk_apps.workoutbase.theme.AccentGreen
+import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.Surface1
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
@@ -72,7 +72,7 @@ fun TrainingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
       },
       enabled = presets.size < MAX_PRESETS,
       modifier = Modifier.fillMaxWidth().height(52.dp),
-      colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = MaterialTheme.colorScheme.onPrimary),
+      colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),
     ) {
       Text("SAVE CURRENT WORKOUT", fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
     }
@@ -152,7 +152,7 @@ private fun PresetRow(preset: TrainingPreset, onLoad: () -> Unit, onDelete: () -
       )
     }
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-      Text("LOAD", color = AccentGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+      Text("LOAD", color = AccentGold, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
       TextButton(onClick = onDelete) { Text("✕", color = TextSecondary) }
     }
   }

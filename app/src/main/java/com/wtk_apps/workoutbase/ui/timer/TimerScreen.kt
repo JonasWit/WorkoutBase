@@ -44,9 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wtk_apps.workoutbase.service.TimerService
-import com.wtk_apps.workoutbase.theme.AccentGreen
-import com.wtk_apps.workoutbase.theme.PrepareBlue
-import com.wtk_apps.workoutbase.theme.RestTeal
+import com.wtk_apps.workoutbase.theme.AccentGold
+import com.wtk_apps.workoutbase.theme.PrepareYellow
+import com.wtk_apps.workoutbase.theme.RestOrange
 import com.wtk_apps.workoutbase.theme.Surface2
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
@@ -204,7 +204,7 @@ private fun Controls(state: TimerState) {
     Button(
       onClick = { TimerController.toggle() },
       modifier = Modifier.weight(1f).height(56.dp),
-      colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = MaterialTheme.colorScheme.onPrimary),
+      colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),
     ) {
       Text(primaryLabel, fontSize = 18.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
     }
@@ -217,9 +217,9 @@ private fun phaseColor(state: TimerState): Color {
   val target =
     when (state.phase) {
       TimerPhase.WORK -> workProgressColor(state.progress)
-      TimerPhase.REST -> RestTeal
-      TimerPhase.PREPARE -> PrepareBlue
-      TimerPhase.IDLE, TimerPhase.FINISHED -> AccentGreen
+      TimerPhase.REST -> RestOrange
+      TimerPhase.PREPARE -> PrepareYellow
+      TimerPhase.IDLE, TimerPhase.FINISHED -> AccentGold
     }
   return animateColorAsState(target, tween(400), label = "phaseColor").value
 }
