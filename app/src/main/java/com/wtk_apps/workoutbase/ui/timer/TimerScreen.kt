@@ -45,8 +45,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wtk_apps.workoutbase.service.TimerService
 import com.wtk_apps.workoutbase.theme.AccentGold
-import com.wtk_apps.workoutbase.theme.PrepareYellow
-import com.wtk_apps.workoutbase.theme.RestOrange
+import com.wtk_apps.workoutbase.theme.PrepareBlue
+import com.wtk_apps.workoutbase.theme.RestGreen
 import com.wtk_apps.workoutbase.theme.Surface2
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
@@ -81,7 +81,7 @@ fun TimerScreen(
     )
 
   Box(modifier = modifier.fillMaxSize()) {
-    BreathingGlow(color = phaseColor, active = state.running)
+    PulsingEdgeGlow(color = phaseColor, active = state.running)
 
     // Top bar, pinned to the top edge.
     Row(
@@ -217,35 +217,39 @@ private fun phaseColor(state: TimerState): Color {
   val target =
     when (state.phase) {
       TimerPhase.WORK -> workProgressColor(state.progress)
-      TimerPhase.REST -> RestOrange
-      TimerPhase.PREPARE -> PrepareYellow
+      TimerPhase.REST -> RestGreen
+      TimerPhase.PREPARE -> PrepareBlue
       TimerPhase.IDLE, TimerPhase.FINISHED -> AccentGold
     }
   return animateColorAsState(target, tween(400), label = "phaseColor").value
 }
 
 @Composable
-private fun BreathingGlow(color: Color, active: Boolean) {
-  val transition = rememberInfiniteTransition(label = "glow")
+private fun PulsingEdgeGlow(color: Color, active: Boolean) {
+  val transition = rememberInfiniteTransition(label = "edge")
   val pulse by
     transition.animateFloat(
-      initialValue = 0.18f,
-      targetValue = 0.45f,
-      animationSpec = infiniteRepeatable(tween(2200, easing = LinearEasing), RepeatMode.Reverse),
-      label = "pulse",
+      initialValue = 0.28f,
+      targetValue = 0.62f,
+      animationSpec = infiniteRepeatable(tween(1500, easing = LinearEasing), RepeatMode.Reverse),
+      label = "edgePulse",
     )
-  val alpha = if (active) pulse else 0.18f
+  val alpha = if (active) pulse else 0.26f
+
   Canvas(modifier = Modifier.fillMaxSize()) {
-    val radius = size.minDimension * 0.85f
-    drawCircle(
-      brush =
-        Brush.radialGradient(
-          colors = listOf(color.copy(alpha = alpha), Color.Transparent),
-          center = center,
-          radius = radius,
-        ),
-      radius = radius,
-      center = center,
-    )
+    val w = size.width
+    val h = size.height
+    val band = minOf(w, h) * 0.16f
+    val edge = color.copy(alpha = alpha)
+    val clear = color.copy(alpha = 0f)
+
+    // Glow inwards from each screen edge.
+    drawRect(Brush.verticalGradient(listOf(edge, clear), startY = 0f, endY = band), topLeft = Offset(0f, 0f), size = androidx.compose.ui.geometry.Size(w, band))
+    drawRect(Brush.verticalGradient(listOf(clear, edge), startY = h - band, endY = h), topLeft = Offset(0f, h - band), size = androidx.compose.ui.geometry.Size(w, band))
+    drawRect(Brush.horizontalGradient(listOf(edge, clear), startX = 0f, endX = band), topLeft = Offset(0f, 0f), size = androidx.compose.ui.geometry.Size(band, h))
+    drawRect(Brush.horizontalGradient(listOf(clear, edge), startX = w - band, endX = w), topLeft = Offset(w - band, 0f), size = androidx.compose.ui.geometry.Size(band, h))
+
+    // A soft rim to define the border.
+    drawRect(color = color.copy(alpha = alpha * 0.7f), style = Stroke(width = 2.dp.toPx()))
   }
 }

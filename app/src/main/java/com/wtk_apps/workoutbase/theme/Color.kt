@@ -16,5 +16,5 @@ val AccentGold = Color(0xFFD4AF37) // primary accent / buttons
 val WorkYellow = Color(0xFFF5C542)
 val WorkOrange = Color(0xFFE8862B)
 val WorkRedOrange = Color(0xFFC7431F)
-val RestOrange = Color(0xFFCC8A3A)
-val PrepareYellow = Color(0xFFF0CE6E)
+val RestGreen = Color(0xFF57B37B)
+val PrepareBlue = Color(0xFF5B8FD9)

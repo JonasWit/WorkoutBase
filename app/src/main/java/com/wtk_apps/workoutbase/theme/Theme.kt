@@ -8,9 +8,9 @@ private val WorkoutColorScheme =
   darkColorScheme(
     primary = AccentGold,
     onPrimary = Ink,
-    secondary = RestOrange,
+    secondary = RestGreen,
     onSecondary = Ink,
-    tertiary = PrepareYellow,
+    tertiary = PrepareBlue,
     onTertiary = Ink,
     background = Ink,
     onBackground = TextPrimary,
