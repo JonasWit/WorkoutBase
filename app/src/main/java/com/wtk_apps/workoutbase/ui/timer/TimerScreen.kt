@@ -1,7 +1,5 @@
 package com.wtk_apps.workoutbase.ui.timer
 
-import android.graphics.BlurMaskFilter
-import android.graphics.Paint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -38,9 +36,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -85,7 +80,7 @@ fun TimerScreen(
     )
 
   Box(modifier = modifier.fillMaxSize()) {
-    PulsingEdgeGlow(color = phaseColor, active = state.running)
+    BackgroundPulse(color = phaseColor, active = state.running)
 
     // Top bar, pinned to the top edge.
     Row(
@@ -228,33 +223,19 @@ private fun phaseColor(state: TimerState): Color {
   return animateColorAsState(target, tween(400), label = "phaseColor").value
 }
 
+/** A very subtle, even pulse of the whole background, tinted with the phase colour. */
 @Composable
-private fun PulsingEdgeGlow(color: Color, active: Boolean) {
-  val transition = rememberInfiniteTransition(label = "edge")
+private fun BackgroundPulse(color: Color, active: Boolean) {
+  val transition = rememberInfiniteTransition(label = "background")
   val pulse by
     transition.animateFloat(
-      initialValue = 0.30f,
-      targetValue = 0.66f,
-      animationSpec = infiniteRepeatable(tween(1600, easing = LinearEasing), RepeatMode.Reverse),
-      label = "edgePulse",
+      initialValue = 0.03f,
+      targetValue = 0.10f,
+      animationSpec = infiniteRepeatable(tween(2600, easing = LinearEasing), RepeatMode.Reverse),
+      label = "backgroundPulse",
     )
-  val alpha = if (active) pulse else 0.28f
-
+  val alpha = if (active) pulse else 0.04f
   Canvas(modifier = Modifier.fillMaxSize()) {
-    val minSide = minOf(size.width, size.height)
-    drawIntoCanvas { canvas ->
-      val paint =
-        Paint(Paint.ANTI_ALIAS_FLAG).apply {
-          style = Paint.Style.STROKE
-          this.color = color.toArgb()
-          this.alpha = (alpha.coerceIn(0f, 1f) * 255f).toInt()
-          strokeWidth = minSide * 0.62f
-          maskFilter = BlurMaskFilter(minSide * 0.17f, BlurMaskFilter.Blur.NORMAL)
-        }
-      val radius = minSide * 0.30f
-      // Drawn on the screen bounds so only the inner, blurred half is visible:
-      // a soft, rounded glow that fades smoothly into the black centre.
-      canvas.nativeCanvas.drawRoundRect(0f, 0f, size.width, size.height, radius, radius, paint)
-    }
+    drawRect(color = color.copy(alpha = alpha))
   }
 }
