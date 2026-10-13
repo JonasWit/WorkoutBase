@@ -302,9 +302,9 @@ uniform float uColorG;
 uniform float uColorB;
 
 float hash21(float2 p) {
-  p = fract(p * float2(123.34, 456.21));
-  p += dot(p, p + 45.32);
-  return fract(p.x * p.y);
+  float3 p3 = fract(float3(p.x, p.y, p.x) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
 }
 
 float noise(float2 p) {
