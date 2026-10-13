@@ -1,6 +1,7 @@
 package com.wtk_apps.workoutbase.ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,12 +12,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -30,7 +35,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -40,6 +48,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextAlign
 import com.wtk_apps.workoutbase.AppGraph
 import com.wtk_apps.workoutbase.theme.AccentGold
+import com.wtk_apps.workoutbase.theme.Outline1
+import com.wtk_apps.workoutbase.theme.Surface2
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.timer.TimerController
@@ -138,14 +148,9 @@ private fun NumberSetting(
   ) {
     Text(label, color = TextPrimary)
     Row(verticalAlignment = Alignment.CenterVertically) {
-      FilledTonalButton(
-        onClick = {
-          draft = null
-          onChange((value - step).coerceIn(range))
-        },
-        modifier = Modifier.size(44.dp),
-      ) {
-        Text("−")
+      StepButton(plus = false) {
+        draft = null
+        onChange((value - step).coerceIn(range))
       }
       OutlinedTextField(
         value = draft ?: value.toString(),
@@ -162,14 +167,33 @@ private fun NumberSetting(
             if (!focusState.isFocused) draft = null
           },
       )
-      FilledTonalButton(
-        onClick = {
-          draft = null
-          onChange((value + step).coerceIn(range))
-        },
-        modifier = Modifier.size(44.dp),
-      ) {
-        Text("+")
+      StepButton(plus = true) {
+        draft = null
+        onChange((value + step).coerceIn(range))
+      }
+    }
+  }
+}
+
+/** Round stepper button with a centred, drawn +/- glyph (no font-metric offsets). */
+@Composable
+private fun StepButton(plus: Boolean, onClick: () -> Unit) {
+  Box(
+    modifier =
+      Modifier.size(44.dp)
+        .clip(CircleShape)
+        .background(Surface2)
+        .border(1.dp, Outline1, CircleShape)
+        .clickable(onClick = onClick),
+    contentAlignment = Alignment.Center,
+  ) {
+    Canvas(modifier = Modifier.size(20.dp)) {
+      val stroke = 2.4.dp.toPx()
+      val c = center
+      val arm = size.minDimension / 2f * 0.82f
+      drawLine(AccentGold, Offset(c.x - arm, c.y), Offset(c.x + arm, c.y), strokeWidth = stroke, cap = StrokeCap.Round)
+      if (plus) {
+        drawLine(AccentGold, Offset(c.x, c.y - arm), Offset(c.x, c.y + arm), strokeWidth = stroke, cap = StrokeCap.Round)
       }
     }
   }

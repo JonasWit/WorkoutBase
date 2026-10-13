@@ -3,7 +3,10 @@ package com.wtk_apps.workoutbase.ui.trainings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +14,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -29,6 +35,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +45,11 @@ import com.wtk_apps.workoutbase.AppGraph
 import com.wtk_apps.workoutbase.data.MAX_PRESETS
 import com.wtk_apps.workoutbase.data.TrainingPreset
 import com.wtk_apps.workoutbase.theme.AccentGold
+import com.wtk_apps.workoutbase.theme.PrepareBlue
+import com.wtk_apps.workoutbase.theme.RestGreen
 import com.wtk_apps.workoutbase.theme.Surface1
+import com.wtk_apps.workoutbase.theme.Surface2
+import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.timer.TimerController
@@ -131,29 +143,56 @@ fun TrainingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
   }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PresetRow(preset: TrainingPreset, onLoad: () -> Unit, onDelete: () -> Unit) {
   val config = preset.config
   Row(
     modifier =
       Modifier.fillMaxWidth()
-        .background(Surface1, RoundedCornerShape(14.dp))
+        .background(Surface1, RoundedCornerShape(16.dp))
         .clickable(onClick = onLoad)
         .padding(horizontal = 16.dp, vertical = 14.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Column(modifier = Modifier.weight(1f)) {
-      Text(preset.name, color = TextPrimary, fontWeight = FontWeight.SemiBold)
-      Spacer(Modifier.height(2.dp))
-      Text(
-        "${config.rounds} × ${formatMillis(config.workMillis)} work / ${formatMillis(config.restMillis)} rest",
-        color = TextSecondary,
-        fontSize = 13.sp,
-      )
+      Text(preset.name, color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+      Spacer(Modifier.height(9.dp))
+      FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+      ) {
+        DetailChip("ROUNDS", config.rounds.toString(), AccentGold)
+        DetailChip("WORK", formatMillis(config.workMillis), WorkYellow)
+        DetailChip("REST", formatMillis(config.restMillis), RestGreen)
+        if (config.prepareMillis > 0) {
+          DetailChip("PREP", formatMillis(config.prepareMillis), PrepareBlue)
+        }
+      }
     }
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+    Spacer(Modifier.width(10.dp))
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
       Text("LOAD", color = AccentGold, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-      TextButton(onClick = onDelete) { Text("✕", color = TextSecondary) }
+      TextButton(onClick = onDelete) { Text("✕", color = TextSecondary, fontSize = 16.sp) }
+    }
+  }
+}
+
+/** Small structured chip: coloured dot + label above value. */
+@Composable
+private fun DetailChip(label: String, value: String, dotColor: Color) {
+  Row(
+    modifier =
+      Modifier.clip(RoundedCornerShape(10.dp))
+        .background(Surface2)
+        .padding(horizontal = 10.dp, vertical = 6.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Box(modifier = Modifier.size(7.dp).clip(CircleShape).background(dotColor))
+    Spacer(Modifier.width(7.dp))
+    Column {
+      Text(label, color = TextSecondary, fontSize = 9.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
+      Text(value, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
     }
   }
 }
