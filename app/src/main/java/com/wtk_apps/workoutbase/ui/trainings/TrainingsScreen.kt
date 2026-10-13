@@ -1,5 +1,6 @@
 package com.wtk_apps.workoutbase.ui.trainings
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,7 +23,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,8 +39,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wtk_apps.workoutbase.AppGraph
 import com.wtk_apps.workoutbase.data.MAX_PRESETS
@@ -135,48 +140,73 @@ fun TrainingsScreen(onBack: () -> Unit, onEdit: (Int) -> Unit, modifier: Modifie
   val actionIndex = actionsFor
   if (actionIndex != null) {
     val preset = presets.getOrNull(actionIndex)
-    AlertDialog(
-      onDismissRequest = { actionsFor = null },
-      title = { Text(preset?.name ?: "Training") },
-      text = {
-        Column {
-          TextButton(
-            onClick = {
-              preset?.let {
-                scope.launch {
-                  AppGraph.settings.save(it.config)
-                  TimerController.configure(it.config)
-                }
-                onBack()
+    Dialog(onDismissRequest = { actionsFor = null }) {
+      Surface(
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+      ) {
+        Column(
+          modifier = Modifier.padding(horizontal = 20.dp, vertical = 22.dp),
+          horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+          Text(
+            text = preset?.name ?: "Training",
+            color = TextPrimary,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+          )
+          Spacer(Modifier.height(18.dp))
+          DialogAction("LOAD", filled = true, accent = AccentGold) {
+            preset?.let {
+              scope.launch {
+                AppGraph.settings.save(it.config)
+                TimerController.configure(it.config)
               }
-              actionsFor = null
-            },
-            modifier = Modifier.fillMaxWidth(),
-          ) {
-            Text("LOAD", color = AccentGold, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+              onBack()
+            }
+            actionsFor = null
           }
-          TextButton(
-            onClick = {
-              actionsFor = null
-              onEdit(actionIndex)
-            },
-            modifier = Modifier.fillMaxWidth(),
-          ) {
-            Text("EDIT", color = TextPrimary, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+          Spacer(Modifier.height(10.dp))
+          DialogAction("EDIT", filled = false, accent = AccentGold) {
+            actionsFor = null
+            onEdit(actionIndex)
           }
-          TextButton(
-            onClick = {
-              actionsFor = null
-              scope.launch { AppGraph.settings.deletePreset(actionIndex) }
-            },
-            modifier = Modifier.fillMaxWidth(),
-          ) {
-            Text("DELETE", color = WorkRedOrange, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+          Spacer(Modifier.height(10.dp))
+          DialogAction("DELETE", filled = false, accent = WorkRedOrange) {
+            actionsFor = null
+            scope.launch { AppGraph.settings.deletePreset(actionIndex) }
           }
+          Spacer(Modifier.height(4.dp))
+          TextButton(onClick = { actionsFor = null }) { Text("Cancel", color = TextSecondary) }
         }
-      },
-      confirmButton = { TextButton(onClick = { actionsFor = null }) { Text("Cancel") } },
-    )
+      }
+    }
+  }
+}
+
+@Composable
+private fun DialogAction(label: String, filled: Boolean, accent: Color, onClick: () -> Unit) {
+  if (filled) {
+    Button(
+      onClick = onClick,
+      modifier = Modifier.fillMaxWidth().height(50.dp),
+      shape = RoundedCornerShape(14.dp),
+      colors = ButtonDefaults.buttonColors(containerColor = accent, contentColor = MaterialTheme.colorScheme.onPrimary),
+    ) {
+      Text(label, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+    }
+  } else {
+    OutlinedButton(
+      onClick = onClick,
+      modifier = Modifier.fillMaxWidth().height(50.dp),
+      shape = RoundedCornerShape(14.dp),
+      border = BorderStroke(1.5.dp, accent.copy(alpha = 0.85f)),
+      colors = ButtonDefaults.outlinedButtonColors(contentColor = accent),
+    ) {
+      Text(label, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+    }
   }
 }
 
