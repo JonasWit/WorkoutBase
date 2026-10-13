@@ -67,6 +67,7 @@ import com.wtk_apps.workoutbase.theme.RestGreen
 import com.wtk_apps.workoutbase.theme.Surface2
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
+import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.theme.workProgressColor
 import com.wtk_apps.workoutbase.timer.TimerController
 import com.wtk_apps.workoutbase.timer.TimerPhase
@@ -175,14 +176,38 @@ private fun PhaseHeader(state: TimerState, color: Color) {
     fontWeight = FontWeight.Medium,
     letterSpacing = 6.sp,
   )
+  Spacer(Modifier.height(10.dp))
+  Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+    ParamChip("WORK", formatMillis(state.config.workMillis), WorkYellow)
+    ParamChip("REST", formatMillis(state.config.restMillis), RestGreen)
+    if (state.config.prepareMillis > 0) {
+      ParamChip("PREP", formatMillis(state.config.prepareMillis), PrepareBlue)
+    }
+  }
   if (state.round > 0) {
-    Spacer(Modifier.height(4.dp))
+    Spacer(Modifier.height(10.dp))
     Text(
       text = "ROUND ${state.round} / ${state.config.rounds}",
       color = TextSecondary,
       fontSize = 14.sp,
       letterSpacing = 3.sp,
     )
+  }
+}
+
+/** Small parameter chip with a border in its phase colour. */
+@Composable
+private fun ParamChip(label: String, value: String, accent: Color) {
+  Column(
+    modifier =
+      Modifier.clip(RoundedCornerShape(9.dp))
+        .background(Surface2.copy(alpha = 0.75f))
+        .border(1.dp, accent.copy(alpha = 0.7f), RoundedCornerShape(9.dp))
+        .padding(horizontal = 12.dp, vertical = 5.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Text(label, color = accent, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
+    Text(value, color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
   }
 }
 
