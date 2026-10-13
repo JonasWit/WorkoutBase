@@ -10,12 +10,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,14 +30,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
 import com.wtk_apps.workoutbase.AppGraph
 import com.wtk_apps.workoutbase.theme.AccentGreen
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
-import com.wtk_apps.workoutbase.timer.TimerConfig
 import com.wtk_apps.workoutbase.timer.TimerController
 import kotlinx.coroutines.launch
 
@@ -55,26 +62,26 @@ fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
     Spacer(Modifier.height(16.dp))
 
     SectionTitle("Session")
-    Stepper("Rounds", config.rounds.toString()) {
-      config = config.copy(rounds = (config.rounds + it).coerceIn(1, 99))
+    NumberSetting("Rounds", config.rounds, step = 1, range = 1..99) {
+      config = config.copy(rounds = it)
     }
-    Stepper("Work (s)", (config.workMillis / 1000).toString()) {
-      config = config.copy(workMillis = ((config.workMillis / 1000 + it * 15L).coerceIn(5L, 3600L)) * 1000)
+    NumberSetting("Work (s)", (config.workMillis / 1000).toInt(), step = 5, range = 5..3600) {
+      config = config.copy(workMillis = it * 1000L)
     }
-    Stepper("Rest (s)", (config.restMillis / 1000).toString()) {
-      config = config.copy(restMillis = ((config.restMillis / 1000 + it * 15L).coerceIn(0L, 3600L)) * 1000)
+    NumberSetting("Rest (s)", (config.restMillis / 1000).toInt(), step = 5, range = 0..3600) {
+      config = config.copy(restMillis = it * 1000L)
     }
-    Stepper("Prepare (s)", (config.prepareMillis / 1000).toString()) {
-      config = config.copy(prepareMillis = ((config.prepareMillis / 1000 + it * 5L).coerceIn(0L, 600L)) * 1000)
+    NumberSetting("Prepare (s)", (config.prepareMillis / 1000).toInt(), step = 5, range = 0..600) {
+      config = config.copy(prepareMillis = it * 1000L)
     }
 
     Spacer(Modifier.height(16.dp))
     SectionTitle("Cues")
-    Stepper("Warning (s)", (config.warnMillis / 1000).toString()) {
-      config = config.copy(warnMillis = ((config.warnMillis / 1000 + it * 5L).coerceIn(0L, 600L)) * 1000)
+    NumberSetting("Warning (s)", (config.warnMillis / 1000).toInt(), step = 5, range = 0..600) {
+      config = config.copy(warnMillis = it * 1000L)
     }
-    Stepper("Countdown (s)", config.countdownSeconds.toString()) {
-      config = config.copy(countdownSeconds = (config.countdownSeconds + it).coerceIn(0, 10))
+    NumberSetting("Countdown (s)", config.countdownSeconds, step = 1, range = 0..10) {
+      config = config.copy(countdownSeconds = it)
     }
     Toggle("Half-way cue", config.halfWayEnabled) { config = config.copy(halfWayEnabled = it) }
     Toggle("Warning cue", config.warnEnabled) { config = config.copy(warnEnabled = it) }
@@ -111,8 +118,23 @@ private fun SectionTitle(text: String) {
   Spacer(Modifier.height(8.dp))
 }
 
+/**
+ * A numeric setting with -/+ buttons (stepping by [step]) and an editable text
+ * field so a value can also be typed directly.
+ */
 @Composable
-private fun Stepper(label: String, value: String, onChange: (Int) -> Unit) {
+private fun NumberSetting(
+  label: String,
+  value: Int,
+  step: Int,
+  range: IntRange,
+  onChange: (Int) -> Unit,
+) {
+  // When the user is typing, [draft] holds the raw text; otherwise the field
+  // shows the canonical [value]. This keeps the field correct whether the value
+  // changes via the keyboard or via the -/+ buttons.
+  var draft by remember { mutableStateOf<String?>(null) }
+
   Row(
     modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
     verticalAlignment = Alignment.CenterVertically,
@@ -120,14 +142,39 @@ private fun Stepper(label: String, value: String, onChange: (Int) -> Unit) {
   ) {
     Text(label, color = TextPrimary)
     Row(verticalAlignment = Alignment.CenterVertically) {
-      FilledTonalButton(onClick = { onChange(-1) }, modifier = Modifier.size(44.dp)) { Text("−") }
-      Text(
-        value,
-        color = TextPrimary,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(horizontal = 16.dp),
+      FilledTonalButton(
+        onClick = {
+          draft = null
+          onChange((value - step).coerceIn(range))
+        },
+        modifier = Modifier.size(44.dp),
+      ) {
+        Text("−")
+      }
+      OutlinedTextField(
+        value = draft ?: value.toString(),
+        onValueChange = { new ->
+          val digits = new.filter { it.isDigit() }.take(4)
+          draft = digits
+          digits.toIntOrNull()?.let { if (it in range) onChange(it) }
+        },
+        singleLine = true,
+        textStyle = TextStyle(color = TextPrimary, fontSize = 16.sp, textAlign = TextAlign.Center),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+        modifier =
+          Modifier.width(78.dp).padding(horizontal = 8.dp).onFocusChanged { focusState ->
+            if (!focusState.isFocused) draft = null
+          },
       )
-      FilledTonalButton(onClick = { onChange(1) }, modifier = Modifier.size(44.dp)) { Text("+") }
+      FilledTonalButton(
+        onClick = {
+          draft = null
+          onChange((value + step).coerceIn(range))
+        },
+        modifier = Modifier.size(44.dp),
+      ) {
+        Text("+")
+      }
     }
   }
 }
