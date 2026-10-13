@@ -57,11 +57,13 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.service.TimerService
 import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.PrepareBlue
@@ -76,6 +78,9 @@ import com.wtk_apps.workoutbase.timer.TimerPhase
 import com.wtk_apps.workoutbase.timer.TimerState
 import com.wtk_apps.workoutbase.timer.formatMillis
 import com.wtk_apps.workoutbase.timer.label
+
+/** Roman-inscription style typeface used for the app title. */
+private val RomanTitleFont = FontFamily(Font(R.font.cinzel))
 
 @Composable
 fun TimerScreen(
@@ -120,7 +125,13 @@ fun TimerScreen(
           .padding(horizontal = 24.dp, vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      Text("WorkoutBase", color = TextPrimary, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+      Text(
+        text = "WORKOUTBASE",
+        color = AccentGold,
+        fontFamily = RomanTitleFont,
+        fontSize = 21.sp,
+        letterSpacing = 2.sp,
+      )
       Spacer(Modifier.weight(1f))
       BottomLink("Settings", onOpenSettings)
     }
