@@ -65,6 +65,7 @@ fun TrainingsScreen(onBack: () -> Unit, onEdit: (Int) -> Unit, modifier: Modifie
   var nameInput by remember { mutableStateOf("") }
   var limitReached by remember { mutableStateOf(false) }
   var actionsFor by remember { mutableStateOf<Int?>(null) }
+  var pendingDelete by remember { mutableStateOf<Int?>(null) }
 
   Column(
     modifier = modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp),
@@ -155,7 +156,7 @@ fun TrainingsScreen(onBack: () -> Unit, onEdit: (Int) -> Unit, modifier: Modifie
             textAlign = TextAlign.Center,
           )
           Spacer(Modifier.height(18.dp))
-          DialogAction("LOAD", filled = true, accent = AccentGold) {
+          DialogAction("LOAD", filled = true, accent = AccentGold, modifier = Modifier.fillMaxWidth()) {
             preset?.let {
               scope.launch {
                 AppGraph.settings.save(it.config)
@@ -166,14 +167,14 @@ fun TrainingsScreen(onBack: () -> Unit, onEdit: (Int) -> Unit, modifier: Modifie
             actionsFor = null
           }
           Spacer(Modifier.height(10.dp))
-          DialogAction("EDIT", filled = false, accent = AccentGold) {
+          DialogAction("EDIT", filled = false, accent = AccentGold, modifier = Modifier.fillMaxWidth()) {
             actionsFor = null
             onEdit(actionIndex)
           }
           Spacer(Modifier.height(10.dp))
-          DialogAction("DELETE", filled = false, accent = WorkRedOrange) {
+          DialogAction("DELETE", filled = false, accent = WorkRedOrange, modifier = Modifier.fillMaxWidth()) {
             actionsFor = null
-            scope.launch { AppGraph.settings.deletePreset(actionIndex) }
+            pendingDelete = actionIndex
           }
           Spacer(Modifier.height(4.dp))
           TextButton(onClick = { actionsFor = null }) { Text("Cancel", color = TextSecondary) }
@@ -181,14 +182,62 @@ fun TrainingsScreen(onBack: () -> Unit, onEdit: (Int) -> Unit, modifier: Modifie
       }
     }
   }
+
+  val deleteIndex = pendingDelete
+  if (deleteIndex != null) {
+    val preset = presets.getOrNull(deleteIndex)
+    Dialog(onDismissRequest = { pendingDelete = null }) {
+      Surface(
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+      ) {
+        Column(
+          modifier = Modifier.padding(horizontal = 20.dp, vertical = 22.dp),
+          horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+          Text(
+            text = "Delete training?",
+            color = TextPrimary,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+          )
+          Spacer(Modifier.height(6.dp))
+          Text(
+            text = preset?.name ?: "",
+            color = TextSecondary,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+          )
+          Spacer(Modifier.height(18.dp))
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            DialogAction("NO", filled = false, accent = TextSecondary, modifier = Modifier.weight(1f)) {
+              pendingDelete = null
+            }
+            DialogAction("YES", filled = true, accent = WorkRedOrange, modifier = Modifier.weight(1f)) {
+              pendingDelete = null
+              scope.launch { AppGraph.settings.deletePreset(deleteIndex) }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 @Composable
-private fun DialogAction(label: String, filled: Boolean, accent: Color, onClick: () -> Unit) {
+private fun DialogAction(
+  label: String,
+  filled: Boolean,
+  accent: Color,
+  modifier: Modifier = Modifier,
+  onClick: () -> Unit,
+) {
   if (filled) {
     Button(
       onClick = onClick,
-      modifier = Modifier.fillMaxWidth().height(50.dp),
+      modifier = modifier.height(50.dp),
       shape = RoundedCornerShape(14.dp),
       colors = ButtonDefaults.buttonColors(containerColor = accent, contentColor = MaterialTheme.colorScheme.onPrimary),
     ) {
@@ -197,7 +246,7 @@ private fun DialogAction(label: String, filled: Boolean, accent: Color, onClick:
   } else {
     OutlinedButton(
       onClick = onClick,
-      modifier = Modifier.fillMaxWidth().height(50.dp),
+      modifier = modifier.height(50.dp),
       shape = RoundedCornerShape(14.dp),
       border = BorderStroke(1.5.dp, accent.copy(alpha = 0.85f)),
       colors = ButtonDefaults.outlinedButtonColors(contentColor = accent),
