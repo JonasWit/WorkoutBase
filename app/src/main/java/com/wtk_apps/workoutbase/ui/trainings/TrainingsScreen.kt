@@ -1,9 +1,9 @@
 package com.wtk_apps.workoutbase.ui.trainings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -14,10 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -178,21 +176,17 @@ private fun PresetRow(preset: TrainingPreset, onLoad: () -> Unit, onDelete: () -
   }
 }
 
-/** Small structured chip: coloured dot + label above value. */
+/** Small structured chip with a border in its phase colour. */
 @Composable
-private fun DetailChip(label: String, value: String, dotColor: Color) {
-  Row(
+private fun DetailChip(label: String, value: String, accent: Color) {
+  Column(
     modifier =
       Modifier.clip(RoundedCornerShape(10.dp))
         .background(Surface2)
-        .padding(horizontal = 10.dp, vertical = 6.dp),
-    verticalAlignment = Alignment.CenterVertically,
+        .border(1.dp, accent.copy(alpha = 0.7f), RoundedCornerShape(10.dp))
+        .padding(horizontal = 12.dp, vertical = 6.dp),
   ) {
-    Box(modifier = Modifier.size(7.dp).clip(CircleShape).background(dotColor))
-    Spacer(Modifier.width(7.dp))
-    Column {
-      Text(label, color = TextSecondary, fontSize = 9.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
-      Text(value, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-    }
+    Text(label, color = accent, fontSize = 9.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
+    Text(value, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
   }
 }
