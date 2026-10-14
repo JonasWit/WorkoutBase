@@ -254,7 +254,7 @@ private fun SessionProgressBar(
   Canvas(modifier = modifier.height(18.dp)) {
     val w = size.width
     val h = size.height
-    val radius = h / 2f
+    val radius = h * 0.25f
     val bar = Path().apply { addRoundRect(RoundRect(0f, 0f, w, h, CornerRadius(radius, radius))) }
     val playX = w * fill
 
