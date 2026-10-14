@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -259,12 +260,22 @@ private fun SessionProgressBar(
 
     clipPath(bar) {
       var x = 0f
-      segments.forEach { seg ->
+      segments.forEachIndexed { i, seg ->
         val sw = w * (seg.millis.toFloat() / total)
         val c = segmentColor(seg.phase)
+        // Dim track for the whole section.
         drawRect(c.copy(alpha = 0.22f), topLeft = Offset(x, 0f), size = Size(sw, h))
+        // Elapsed part: flickering, glossy colour like the flames.
         val filled = (minOf(x + sw, playX) - x).coerceAtLeast(0f)
-        if (filled > 0f) drawRect(c, topLeft = Offset(x, 0f), size = Size(filled, h))
+        if (filled > 0f) {
+          val flick = 0.5f + 0.5f * kotlin.math.sin(shimmer.floatValue * 6.2831855f * (1f + (i % 3)) + i * 1.7f)
+          val bright = lerp(c, Color.White, 0.10f + 0.28f * flick)
+          drawRect(
+            brush = Brush.verticalGradient(listOf(lerp(bright, Color.White, 0.20f), bright, c), startY = 0f, endY = h),
+            topLeft = Offset(x, 0f),
+            size = Size(filled, h),
+          )
+        }
         x += sw
       }
     }
