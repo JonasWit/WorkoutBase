@@ -93,4 +93,29 @@ class TotalTimeTest {
     }
     assertEquals(0L, totalRemainingMillis(state))
   }
+
+  @Test
+  fun sessionSegments_listsPrepareThenWorkAndRestPerRound() {
+    val cfg = config(rounds = 3, workMillis = 10_000L, restMillis = 5_000L, prepareMillis = 5_000L)
+    val segments = sessionSegments(cfg)
+    assertEquals(
+      listOf(
+        TimerPhase.PREPARE to 5_000L,
+        TimerPhase.WORK to 10_000L,
+        TimerPhase.REST to 5_000L,
+        TimerPhase.WORK to 10_000L,
+        TimerPhase.REST to 5_000L,
+        TimerPhase.WORK to 10_000L,
+      ),
+      segments.map { it.phase to it.millis },
+    )
+    // The sections add up to the whole session.
+    assertEquals(totalSessionMillis(cfg), segments.sumOf { it.millis })
+  }
+
+  @Test
+  fun sessionSegments_omitsPrepareAndTrailingRestWhenAbsent() {
+    val cfg = config(rounds = 1, workMillis = 4_000L, restMillis = 5_000L, prepareMillis = 0L)
+    assertEquals(listOf(TimerPhase.WORK to 4_000L), sessionSegments(cfg).map { it.phase to it.millis })
+  }
 }

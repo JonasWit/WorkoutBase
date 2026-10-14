@@ -14,6 +14,20 @@ fun formatMillis(millis: Long): String {
  */
 const val MAX_PHASE_SECONDS = 99 * 60 + 59
 
+/** One contiguous section of a session, used to draw the progress bar. */
+data class SessionSegment(val phase: TimerPhase, val millis: Long)
+
+/** Ordered sections of a full session: prepare, then work/rest for each round. */
+fun sessionSegments(config: TimerConfig): List<SessionSegment> {
+  val out = mutableListOf<SessionSegment>()
+  if (config.prepareMillis > 0L) out += SessionSegment(TimerPhase.PREPARE, config.prepareMillis)
+  for (round in 1..config.rounds) {
+    out += SessionSegment(TimerPhase.WORK, config.workMillis)
+    if (round < config.rounds && config.restMillis > 0L) out += SessionSegment(TimerPhase.REST, config.restMillis)
+  }
+  return out
+}
+
 /** Total duration of a full session: prepare + rounds*work + (rounds-1)*rest. */
 fun totalSessionMillis(config: TimerConfig): Long {
   val rests = (config.rounds - 1).coerceAtLeast(0)

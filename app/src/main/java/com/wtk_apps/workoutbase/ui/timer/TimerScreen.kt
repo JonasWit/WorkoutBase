@@ -48,6 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -56,6 +58,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
@@ -68,6 +71,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.service.TimerService
 import com.wtk_apps.workoutbase.theme.AccentGold
+import com.wtk_apps.workoutbase.theme.Ink
 import com.wtk_apps.workoutbase.theme.PrepareBlue
 import com.wtk_apps.workoutbase.theme.RestGreen
 import com.wtk_apps.workoutbase.theme.Surface2
@@ -76,10 +80,12 @@ import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.theme.workProgressColor
 import com.wtk_apps.workoutbase.timer.TimerController
+import com.wtk_apps.workoutbase.timer.TimerConfig
 import com.wtk_apps.workoutbase.timer.TimerPhase
 import com.wtk_apps.workoutbase.timer.TimerState
 import com.wtk_apps.workoutbase.timer.formatMillis
 import com.wtk_apps.workoutbase.timer.label
+import com.wtk_apps.workoutbase.timer.sessionSegments
 import com.wtk_apps.workoutbase.timer.totalRemainingMillis
 import com.wtk_apps.workoutbase.timer.totalSessionMillis
 
@@ -205,25 +211,65 @@ private fun PhaseHeader(state: TimerState, color: Color) {
       letterSpacing = 3.sp,
     )
   }
-  Spacer(Modifier.height(8.dp))
-  Row(verticalAlignment = Alignment.CenterVertically) {
-    Text("TOTAL ", color = TextSecondary, fontSize = 11.sp, letterSpacing = 1.sp)
-    Text(
-      text = formatMillis(totalSessionMillis(state.config)),
+  Spacer(Modifier.height(14.dp))
+  SessionProgressBar(
+    config = state.config,
+    remainingMillis = totalRemainingMillis(state),
+    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+  )
+}
+
+/** Segmented session bar: PREPARE / WORK / REST sections split by dividers. */
+@Composable
+private fun SessionProgressBar(config: TimerConfig, remainingMillis: Long, modifier: Modifier = Modifier) {
+  val segments = remember(config) { sessionSegments(config) }
+  val total = remember(segments) { segments.sumOf { it.millis }.coerceAtLeast(1L) }
+  val target = ((total - remainingMillis).toFloat() / total).coerceIn(0f, 1f)
+  val fill by animateFloatAsState(target, tween(400, easing = LinearEasing), label = "sessionFill")
+
+  Canvas(modifier = modifier.height(18.dp)) {
+    val w = size.width
+    val h = size.height
+    val radius = h / 2f
+    val bar = Path().apply { addRoundRect(RoundRect(0f, 0f, w, h, CornerRadius(radius, radius))) }
+    val playX = w * fill
+
+    clipPath(bar) {
+      var x = 0f
+      segments.forEach { seg ->
+        val sw = w * (seg.millis.toFloat() / total)
+        val c = segmentColor(seg.phase)
+        drawRect(c.copy(alpha = 0.22f), topLeft = Offset(x, 0f), size = Size(sw, h))
+        val filled = (minOf(x + sw, playX) - x).coerceAtLeast(0f)
+        if (filled > 0f) drawRect(c, topLeft = Offset(x, 0f), size = Size(filled, h))
+        x += sw
+      }
+    }
+
+    // Dividers between sections.
+    var dividerX = 0f
+    for (i in 0 until segments.size - 1) {
+      dividerX += w * (segments[i].millis.toFloat() / total)
+      drawRect(Ink, topLeft = Offset(dividerX - 1.5.dp.toPx(), 0f), size = Size(3.dp.toPx(), h))
+    }
+
+    // Animated playhead.
+    drawLine(
       color = TextPrimary,
-      fontSize = 13.sp,
-      fontWeight = FontWeight.SemiBold,
-    )
-    Spacer(Modifier.width(14.dp))
-    Text("LEFT ", color = TextSecondary, fontSize = 11.sp, letterSpacing = 1.sp)
-    Text(
-      text = formatMillis(totalRemainingMillis(state)),
-      color = AccentGold,
-      fontSize = 13.sp,
-      fontWeight = FontWeight.Bold,
+      start = Offset(playX, -2.dp.toPx()),
+      end = Offset(playX, h + 2.dp.toPx()),
+      strokeWidth = 3.dp.toPx(),
+      cap = StrokeCap.Round,
     )
   }
 }
+
+private fun segmentColor(phase: TimerPhase): Color =
+  when (phase) {
+    TimerPhase.PREPARE -> PrepareBlue
+    TimerPhase.REST -> RestGreen
+    else -> WorkYellow
+  }
 
 /** Small parameter chip with a border in its phase colour; the active phase glows. */
 @Composable
