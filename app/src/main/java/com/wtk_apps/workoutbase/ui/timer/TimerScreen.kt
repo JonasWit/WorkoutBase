@@ -147,7 +147,7 @@ fun TimerScreen(
       ) {
         val dialSize = minOf(maxWidth.value, (maxHeight.value - 150f).coerceAtLeast(170f)).dp
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-          PhaseHeader(state = state, color = phaseColor)
+          PhaseHeader(state = state, color = phaseColor, speed = flameSpeed)
           Spacer(Modifier.height(18.dp))
           TimerDial(state = state, color = phaseColor, progress = ringProgress, size = dialSize)
         }
@@ -184,7 +184,7 @@ private fun BottomLink(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun PhaseHeader(state: TimerState, color: Color) {
+private fun PhaseHeader(state: TimerState, color: Color, speed: Float) {
   Text(
     text = state.phase.label(),
     color = color,
@@ -206,8 +206,9 @@ private fun PhaseHeader(state: TimerState, color: Color) {
     Spacer(Modifier.height(10.dp))
     Text(
       text = "ROUND ${state.round} / ${state.config.rounds}",
-      color = TextSecondary,
-      fontSize = 14.sp,
+      color = Color.White,
+      fontSize = 15.sp,
+      fontWeight = FontWeight.Bold,
       letterSpacing = 3.sp,
     )
   }
@@ -215,17 +216,39 @@ private fun PhaseHeader(state: TimerState, color: Color) {
   SessionProgressBar(
     config = state.config,
     remainingMillis = totalRemainingMillis(state),
+    speed = speed,
     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
   )
 }
 
 /** Segmented session bar: PREPARE / WORK / REST sections split by dividers. */
 @Composable
-private fun SessionProgressBar(config: TimerConfig, remainingMillis: Long, modifier: Modifier = Modifier) {
+private fun SessionProgressBar(
+  config: TimerConfig,
+  remainingMillis: Long,
+  speed: Float,
+  modifier: Modifier = Modifier,
+) {
   val segments = remember(config) { sessionSegments(config) }
   val total = remember(segments) { segments.sumOf { it.millis }.coerceAtLeast(1L) }
   val target = ((total - remainingMillis).toFloat() / total).coerceIn(0f, 1f)
   val fill by animateFloatAsState(target, tween(400, easing = LinearEasing), label = "sessionFill")
+
+  // Fire-like shimmer that sweeps across the bar; faster while working.
+  val shimmer = remember { mutableFloatStateOf(0f) }
+  val currentSpeed = rememberUpdatedState(speed)
+  LaunchedEffect(Unit) {
+    var last = 0L
+    while (true) {
+      withFrameNanos { now ->
+        if (last != 0L) {
+          val dt = (now - last) / 1_000_000_000f
+          shimmer.floatValue = (shimmer.floatValue + dt * (0.22f + currentSpeed.value * 0.20f)) % 1f
+        }
+        last = now
+      }
+    }
+  }
 
   Canvas(modifier = modifier.height(18.dp)) {
     val w = size.width
@@ -251,6 +274,22 @@ private fun SessionProgressBar(config: TimerConfig, remainingMillis: Long, modif
     for (i in 0 until segments.size - 1) {
       dividerX += w * (segments[i].millis.toFloat() / total)
       drawRect(Ink, topLeft = Offset(dividerX - 1.5.dp.toPx(), 0f), size = Size(3.dp.toPx(), h))
+    }
+
+    // Moving shimmer highlight (like the flames).
+    val bandHalf = w * 0.20f
+    val bandCenter = (shimmer.floatValue * 1.6f - 0.3f) * w
+    clipPath(bar) {
+      drawRect(
+        brush =
+          Brush.horizontalGradient(
+            colors = listOf(Color.Transparent, Color.White.copy(alpha = 0.30f), Color.Transparent),
+            startX = bandCenter - bandHalf,
+            endX = bandCenter + bandHalf,
+          ),
+        topLeft = Offset(0f, 0f),
+        size = Size(w, h),
+      )
     }
 
     // Animated playhead.
