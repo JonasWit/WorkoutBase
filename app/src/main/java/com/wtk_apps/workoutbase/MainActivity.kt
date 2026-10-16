@@ -13,11 +13,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wtk_apps.workoutbase.theme.WorkoutBaseTheme
+import com.wtk_apps.workoutbase.timer.TimerController
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,6 +31,8 @@ class MainActivity : ComponentActivity() {
     enableEdgeToEdge()
     setContent {
       WorkoutBaseTheme {
+        val timerState by TimerController.state.collectAsStateWithLifecycle()
+        KeepScreenOnWhileRunning(timerState.running)
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           NotificationPermissionRequest()
           MainNavigation()
@@ -33,6 +40,14 @@ class MainActivity : ComponentActivity() {
       }
     }
   }
+}
+
+/** Keeps the screen awake while a training session is running. */
+@Composable
+private fun KeepScreenOnWhileRunning(running: Boolean) {
+  val view = LocalView.current
+  LaunchedEffect(running) { view.keepScreenOn = running }
+  DisposableEffect(Unit) { onDispose { view.keepScreenOn = false } }
 }
 
 @Composable
