@@ -112,6 +112,23 @@ class WorkoutViewModelsTest {
     }
 
   @Test
+  fun presetsViewModel_importStopsWhenTheStoreIsFull() =
+    runTest(dispatcher) {
+      val store = FakeStore(TimerConfig(), capacity = 1)
+      val viewModel = PresetsViewModel(store, timer)
+      var result: ImportResult? = null
+
+      viewModel.importPresets(
+        listOf(TrainingPreset("A", TimerConfig()), TrainingPreset("B", TimerConfig())),
+      ) { result = it }
+      advanceUntilIdle()
+
+      assertEquals(1, result?.added)
+      assertEquals(1, result?.skipped)
+      assertEquals(1, store.presetsState.value.size)
+    }
+
+  @Test
   fun presetsViewModel_deleteForwardsTheIndex() =
     runTest(dispatcher) {
       val store = FakeStore(TimerConfig())
@@ -125,6 +142,7 @@ class WorkoutViewModelsTest {
 
   private class FakeStore(
     initial: TimerConfig,
+    private val capacity: Int = Int.MAX_VALUE,
   ) : WorkoutStore {
     private val configState = MutableStateFlow(initial)
     override val config: Flow<TimerConfig> = configState
@@ -139,6 +157,7 @@ class WorkoutViewModelsTest {
     }
 
     override suspend fun addPreset(preset: TrainingPreset): Boolean {
+      if (presetsState.value.size >= capacity) return false
       presetsState.value = presetsState.value + preset
       return true
     }

@@ -50,6 +50,21 @@ class PresetsViewModel(
     viewModelScope.launch { store.deletePreset(index) }
   }
 
+  /** Appends imported presets until the store is full; reports what was taken. */
+  fun importPresets(
+    imported: List<TrainingPreset>,
+    onResult: (ImportResult) -> Unit = {},
+  ) {
+    viewModelScope.launch {
+      var added = 0
+      var skipped = 0
+      for (preset in imported) {
+        if (store.addPreset(preset)) added++ else skipped++
+      }
+      onResult(ImportResult(added = added, skipped = skipped))
+    }
+  }
+
   fun apply(
     preset: TrainingPreset,
     onApplied: () -> Unit = {},
@@ -65,3 +80,9 @@ class PresetsViewModel(
     fun factory(): ViewModelProvider.Factory = viewModelFactory { initializer { PresetsViewModel(AppGraph.settings, AppGraph.timer) } }
   }
 }
+
+/** Outcome of an import, so the screen can tell the user what happened. */
+data class ImportResult(
+  val added: Int,
+  val skipped: Int,
+)

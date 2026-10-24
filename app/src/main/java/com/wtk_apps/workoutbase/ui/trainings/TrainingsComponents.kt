@@ -1,5 +1,7 @@
 package com.wtk_apps.workoutbase.ui.trainings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,18 +19,23 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wtk_apps.workoutbase.R
+import com.wtk_apps.workoutbase.data.PresetsBackup
 import com.wtk_apps.workoutbase.data.TrainingPreset
 import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.PrepareBlue
@@ -40,6 +47,7 @@ import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.timer.formatMillis
 import com.wtk_apps.workoutbase.timer.totalSessionMillis
+import com.wtk_apps.workoutbase.ui.PresetsViewModel
 
 @Composable
 internal fun DialogAction(
@@ -133,4 +141,116 @@ internal fun DetailChip(
     Text(label, color = accent, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
     Text(value, color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
   }
+}
+
+/** Outcome of an export or import, rendered with string resources. */
+sealed interface BackupMessage {
+  data class Exported(
+    val count: Int,
+  ) : BackupMessage
+
+  data class Imported(
+    val added: Int,
+    val skipped: Int,
+  ) : BackupMessage
+
+  data object ExportFailed : BackupMessage
+
+  data object ImportFailed : BackupMessage
+}
+
+/** Export and import of all saved trainings, plus the outcome message. */
+@Composable
+internal fun BackupActions(
+  onExport: () -> Unit,
+  onImport: () -> Unit,
+  message: BackupMessage?,
+) {
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    TextButton(onClick = onExport) {
+      Text(
+        stringResource(R.string.action_export),
+        color = TextSecondary,
+        fontSize = 13.sp,
+        letterSpacing = 1.sp,
+      )
+    }
+    TextButton(onClick = onImport) {
+      Text(
+        stringResource(R.string.action_import),
+        color = TextSecondary,
+        fontSize = 13.sp,
+        letterSpacing = 1.sp,
+      )
+    }
+  }
+  when (message) {
+    is BackupMessage.Exported ->
+      Text(stringResource(R.string.backup_exported, message.count), color = TextSecondary, fontSize = 13.sp)
+    is BackupMessage.Imported ->
+      Text(
+        stringResource(R.string.backup_imported, message.added, message.skipped),
+        color = TextSecondary,
+        fontSize = 13.sp,
+      )
+    BackupMessage.ExportFailed ->
+      Text(stringResource(R.string.backup_export_failed), color = TextSecondary, fontSize = 13.sp)
+    BackupMessage.ImportFailed ->
+      Text(stringResource(R.string.backup_import_failed), color = TextSecondary, fontSize = 13.sp)
+    null -> Unit
+  }
+}
+
+/** Owns the export/import launchers so the screen composable stays small. */
+@Composable
+internal fun BackupSection(
+  presets: List<TrainingPreset>,
+  viewModel: PresetsViewModel,
+) {
+  val context = LocalContext.current
+  var message by remember { mutableStateOf<BackupMessage?>(null) }
+
+  val exportLauncher =
+    rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+      if (uri != null) {
+        val written =
+          runCatching {
+            context.contentResolver.openOutputStream(uri)?.use { stream ->
+              stream.write(PresetsBackup.toJson(presets).toByteArray())
+            } ?: error("no output stream")
+          }
+        message = if (written.isSuccess) BackupMessage.Exported(presets.size) else BackupMessage.ExportFailed
+      }
+    }
+
+  val importLauncher =
+    rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+      if (uri != null) {
+        val text =
+          runCatching {
+            context.contentResolver
+              .openInputStream(uri)
+              ?.bufferedReader()
+              ?.use { it.readText() }
+          }.getOrNull()
+        val parsed = text?.let { PresetsBackup.fromJson(it) }
+        if (parsed == null || parsed.isFailure) {
+          message = BackupMessage.ImportFailed
+        } else {
+          viewModel.importPresets(parsed.getOrThrow()) { result ->
+            message = BackupMessage.Imported(added = result.added, skipped = result.skipped)
+          }
+        }
+      }
+    }
+
+  BackupActions(
+    onExport = { exportLauncher.launch("workoutbase-trainings.json") },
+    onImport = { importLauncher.launch(arrayOf("application/json")) },
+    message = message,
+  )
 }
