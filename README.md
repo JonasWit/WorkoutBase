@@ -31,7 +31,7 @@ git config core.hooksPath .githooks
 ## Wersjonowanie
 
 - `versionName` jest semantyczny: `major.minor.patch` — pilnuje tego test.
-- `versionCode` rośnie o 1 przy każdym wydaniu i nigdy nie maleje.
+- **Każda zmiana podbija wersję w tym samym commicie.** `versionCode` zawsze +1, `versionName` jako `major.minor.patch`: patch przy poprawkach, minor przy nowym zachowaniu, major przy zmianie niekompatybilnej. Wersja nigdy nie maleje i nie jest reużywana.
 - Wersja jest pokazywana pod tytułem na ekranie głównym i pochodzi z builda (`BuildConfig`), więc nie rozjeżdża się z manifestem.
 ## Struktura
 
