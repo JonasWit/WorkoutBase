@@ -34,7 +34,6 @@ object AppGraph {
 }
 
 class WorkoutBaseApp : Application() {
-
   private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
   override fun onCreate() {

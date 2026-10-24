@@ -10,3 +10,10 @@ indent_size = 2
 
 [*.{md,yml,yaml}]
 trim_trailing_whitespace = false
+
+[*.{kt,kts}]
+# The application id and package name predate this setup; renaming them would be a
+# separate change touching the manifest, the directory tree and the Play listing.
+ktlint_standard_package-name = disabled
+# Compose composables are PascalCase by convention.
+ktlint_function_naming_ignore_when_annotated_with = Composable

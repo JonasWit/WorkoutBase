@@ -9,7 +9,6 @@ import org.junit.Test
  * it can be tested without Android and so a new cue cannot silently do nothing.
  */
 class CuePlanTest {
-
   @Test
   fun everyCueHasAPlan() {
     TimerCue.entries.forEach { cue ->

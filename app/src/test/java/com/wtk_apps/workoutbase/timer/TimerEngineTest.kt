@@ -13,7 +13,6 @@ import org.junit.Test
  * adjustment and audio/vibration cue emission.
  */
 class TimerEngineTest {
-
   private fun config(
     rounds: Int = 3,
     workMillis: Long = 10_000L,

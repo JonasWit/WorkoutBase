@@ -42,7 +42,11 @@ import kotlinx.coroutines.launch
 
 /** Edits the saved training at [index] (name + parameters) and saves it back. */
 @Composable
-fun EditTrainingScreen(index: Int, onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun EditTrainingScreen(
+  index: Int,
+  onBack: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   val scope = rememberCoroutineScope()
   val presets by AppGraph.settings.presets.collectAsStateWithLifecycle(initialValue = emptyList())
 
@@ -64,7 +68,12 @@ fun EditTrainingScreen(index: Int, onBack: () -> Unit, modifier: Modifier = Modi
   }
 
   Column(
-    modifier = modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp),
+    modifier =
+      modifier
+        .fillMaxSize()
+        .safeDrawingPadding()
+        .verticalScroll(rememberScrollState())
+        .padding(24.dp),
   ) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
       Text("Edit training", color = TextPrimary, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)

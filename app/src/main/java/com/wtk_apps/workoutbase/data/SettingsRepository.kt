@@ -20,8 +20,9 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
  * Field mapping lives in [ConfigPreferences]; this class only handles DataStore access
  * and the preset list.
  */
-class SettingsRepository(context: Context) {
-
+class SettingsRepository(
+  context: Context,
+) {
   private val dataStore = context.applicationContext.dataStore
 
   /** The currently active configuration. */
@@ -39,7 +40,10 @@ class SettingsRepository(context: Context) {
   }
 
   /** Overwrites the saved training at [index]. */
-  suspend fun updatePreset(index: Int, preset: TrainingPreset) {
+  suspend fun updatePreset(
+    index: Int,
+    preset: TrainingPreset,
+  ) {
     dataStore.edit { preferences ->
       if (index in 0 until preferences.presetCount()) {
         preferences.writePreset(index, preset)
@@ -75,18 +79,25 @@ class SettingsRepository(context: Context) {
     }
   }
 
-  private fun readConfig(preferences: Preferences, prefix: String): TimerConfig =
-    runCatching { ConfigPreferences.read(preferences, prefix) }.getOrDefault(TimerConfig())
+  private fun readConfig(
+    preferences: Preferences,
+    prefix: String,
+  ): TimerConfig = runCatching { ConfigPreferences.read(preferences, prefix) }.getOrDefault(TimerConfig())
 
-  private fun readPreset(preferences: Preferences, index: Int): TrainingPreset? {
+  private fun readPreset(
+    preferences: Preferences,
+    index: Int,
+  ): TrainingPreset? {
     val name = preferences[nameKey(index)] ?: return null
     return TrainingPreset(name, readConfig(preferences, presetPrefix(index)))
   }
 
-  private fun Preferences.presetCount(): Int =
-    (this[KEY_PRESET_COUNT] ?: 0).coerceIn(0, MAX_PRESETS)
+  private fun Preferences.presetCount(): Int = (this[KEY_PRESET_COUNT] ?: 0).coerceIn(0, MAX_PRESETS)
 
-  private fun androidx.datastore.preferences.core.MutablePreferences.writePreset(index: Int, preset: TrainingPreset) {
+  private fun androidx.datastore.preferences.core.MutablePreferences.writePreset(
+    index: Int,
+    preset: TrainingPreset,
+  ) {
     this[nameKey(index)] = preset.name
     ConfigPreferences.write(this, presetPrefix(index), preset.config)
   }

@@ -22,7 +22,6 @@ class TimerController(
   private val scope: CoroutineScope,
   private val tickMillis: Long = DEFAULT_TICK_MILLIS,
 ) {
-
   private val _state = MutableStateFlow(TimerEngine.initialState(TimerConfig()))
 
   /** Observable timer state for the UI and the foreground notification. */

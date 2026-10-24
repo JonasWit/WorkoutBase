@@ -17,7 +17,11 @@ fun workProgressColor(progress: Float): Color {
   }
 }
 
-private fun lerpHsv(from: Color, to: Color, t: Float): Color {
+private fun lerpHsv(
+  from: Color,
+  to: Color,
+  t: Float,
+): Color {
   val start = FloatArray(3)
   val end = FloatArray(3)
   android.graphics.Color.colorToHSV(from.toArgb(), start)

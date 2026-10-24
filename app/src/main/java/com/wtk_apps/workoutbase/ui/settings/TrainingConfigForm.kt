@@ -122,7 +122,12 @@ internal fun SectionTitle(text: String) {
 
 /** A single number (no minutes/seconds split), edited through a modal. */
 @Composable
-private fun SingleNumberField(label: String, value: Int, range: IntRange, onChange: (Int) -> Unit) {
+private fun SingleNumberField(
+  label: String,
+  value: Int,
+  range: IntRange,
+  onChange: (Int) -> Unit,
+) {
   var showDialog by remember { mutableStateOf(false) }
 
   Row(
@@ -217,10 +222,15 @@ private fun TimeField(
 
 /** Tappable display box that shows a value and opens the editor. */
 @Composable
-private fun ValueBox(text: String, minWidth: androidx.compose.ui.unit.Dp, onClick: () -> Unit) {
+private fun ValueBox(
+  text: String,
+  minWidth: androidx.compose.ui.unit.Dp,
+  onClick: () -> Unit,
+) {
   Box(
     modifier =
-      Modifier.height(44.dp)
+      Modifier
+        .height(44.dp)
         .defaultMinSize(minWidth = minWidth)
         .clip(RoundedCornerShape(10.dp))
         .background(Surface2)
@@ -312,7 +322,11 @@ private fun FormDialogButton(
 }
 
 @Composable
-private fun Toggle(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+private fun Toggle(
+  label: String,
+  checked: Boolean,
+  onChange: (Boolean) -> Unit,
+) {
   Row(
     modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
     verticalAlignment = Alignment.CenterVertically,

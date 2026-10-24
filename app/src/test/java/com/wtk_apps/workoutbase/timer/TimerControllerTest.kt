@@ -20,7 +20,6 @@ import org.junit.Test
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class TimerControllerTest {
-
   private val scheduler = TestCoroutineScheduler()
   private val dispatcher = StandardTestDispatcher(scheduler)
   private val scope = CoroutineScope(SupervisorJob() + dispatcher)
@@ -138,7 +137,10 @@ class TimerControllerTest {
   private class RecordingCuePlayer : CuePlayer {
     val cues = mutableListOf<TimerCue>()
 
-    override fun play(cue: TimerCue, config: TimerConfig) {
+    override fun play(
+      cue: TimerCue,
+      config: TimerConfig,
+    ) {
       cues += cue
     }
   }

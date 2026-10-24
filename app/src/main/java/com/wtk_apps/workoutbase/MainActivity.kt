@@ -1,7 +1,5 @@
 package com.wtk_apps.workoutbase
 
-import com.wtk_apps.workoutbase.AppGraph
-
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -23,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.wtk_apps.workoutbase.AppGraph
 import com.wtk_apps.workoutbase.theme.WorkoutBaseTheme
 
 class MainActivity : ComponentActivity() {

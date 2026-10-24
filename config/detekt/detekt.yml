@@ -1,0 +1,24 @@
+# Detekt configuration for WorkoutBase.
+#
+# Deliberate deviations from the defaults:
+# - the package name contains an underscore and predates this setup, so the pattern
+#   allows it instead of forcing a rename of the whole application id;
+# - Compose composables are PascalCase by convention, so naming and magic-number
+#   checks ignore @Composable functions;
+# - existing findings are captured in app/detekt-baseline.xml. New code is checked
+#   from zero: do not add entries to the baseline, fix the code.
+
+build:
+  maxIssues: 0
+
+naming:
+  PackageNaming:
+    packagePattern: '[a-z]+(\.[a-z0-9_]+)*'
+  FunctionNaming:
+    ignoreAnnotated:
+      - 'Composable'
+
+style:
+  MagicNumber:
+    ignoreAnnotated:
+      - 'Composable'

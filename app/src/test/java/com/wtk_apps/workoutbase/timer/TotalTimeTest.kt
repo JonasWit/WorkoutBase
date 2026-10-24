@@ -5,7 +5,6 @@ import org.junit.Test
 
 /** Unit tests for the total-session and total-remaining time helpers. */
 class TotalTimeTest {
-
   private fun config(
     rounds: Int = 3,
     workMillis: Long = 10_000L,

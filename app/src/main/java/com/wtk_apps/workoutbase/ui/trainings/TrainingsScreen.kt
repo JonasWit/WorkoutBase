@@ -58,7 +58,11 @@ import com.wtk_apps.workoutbase.timer.totalSessionMillis
 import kotlinx.coroutines.launch
 
 @Composable
-fun TrainingsScreen(onBack: () -> Unit, onEdit: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun TrainingsScreen(
+  onBack: () -> Unit,
+  onEdit: (Int) -> Unit,
+  modifier: Modifier = Modifier,
+) {
   val scope = rememberCoroutineScope()
   val presets by AppGraph.settings.presets.collectAsStateWithLifecycle(initialValue = emptyList())
   var showSaveDialog by remember { mutableStateOf(false) }
@@ -68,7 +72,12 @@ fun TrainingsScreen(onBack: () -> Unit, onEdit: (Int) -> Unit, modifier: Modifie
   var pendingDelete by remember { mutableStateOf<Int?>(null) }
 
   Column(
-    modifier = modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp),
+    modifier =
+      modifier
+        .fillMaxSize()
+        .safeDrawingPadding()
+        .verticalScroll(rememberScrollState())
+        .padding(24.dp),
   ) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
       Text("Trainings", color = TextPrimary, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
@@ -257,11 +266,15 @@ private fun DialogAction(
 }
 
 @Composable
-private fun PresetRow(preset: TrainingPreset, onClick: () -> Unit) {
+private fun PresetRow(
+  preset: TrainingPreset,
+  onClick: () -> Unit,
+) {
   val config = preset.config
   Column(
     modifier =
-      Modifier.fillMaxWidth()
+      Modifier
+        .fillMaxWidth()
         .background(Surface1, RoundedCornerShape(16.dp))
         .clickable(onClick = onClick)
         .padding(horizontal = 14.dp, vertical = 14.dp),
@@ -290,7 +303,12 @@ private fun PresetRow(preset: TrainingPreset, onClick: () -> Unit) {
 
 /** Small structured chip with a border in its phase colour. */
 @Composable
-private fun DetailChip(label: String, value: String, accent: Color, modifier: Modifier = Modifier) {
+private fun DetailChip(
+  label: String,
+  value: String,
+  accent: Color,
+  modifier: Modifier = Modifier,
+) {
   Column(
     modifier =
       modifier

@@ -33,12 +33,20 @@ import com.wtk_apps.workoutbase.theme.TextSecondary
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun SettingsScreen(
+  onBack: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   val scope = rememberCoroutineScope()
   var config by remember { mutableStateOf(AppGraph.timer.state.value.config) }
 
   Column(
-    modifier = modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp),
+    modifier =
+      modifier
+        .fillMaxSize()
+        .safeDrawingPadding()
+        .verticalScroll(rememberScrollState())
+        .padding(24.dp),
   ) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
       Text("Settings", color = TextPrimary, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)

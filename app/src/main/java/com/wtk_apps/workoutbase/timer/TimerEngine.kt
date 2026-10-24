@@ -17,14 +17,19 @@ enum class TimerPhase {
 enum class TimerCue {
   /** Short beep announcing the preparation countdown. */
   PREPARE_START,
+
   /** Gong announcing the start of a work round. */
   WORK_START,
+
   /** Gong announcing the end of a work round. */
   WORK_END,
+
   /** Beep at the half-way point of a work round. */
   HALF_WAY,
+
   /** Short beep for each of the final countdown seconds. */
   COUNTDOWN,
+
   /** Final celebration gong when the whole session ends. */
   FINISHED,
 }
@@ -71,12 +76,19 @@ data class TimerState(
 ) {
   /** Elapsed fraction of the current phase in the range 0f..1f. */
   val progress: Float
-    get() = if (phaseMillis <= 0L) 0f
-    else ((phaseMillis - remainingMillis).toFloat() / phaseMillis).coerceIn(0f, 1f)
+    get() =
+      if (phaseMillis <= 0L) {
+        0f
+      } else {
+        ((phaseMillis - remainingMillis).toFloat() / phaseMillis).coerceIn(0f, 1f)
+      }
 }
 
 /** Result of a state change: the new state plus any cues that fired. */
-data class TimerTransition(val state: TimerState, val cues: List<TimerCue> = emptyList())
+data class TimerTransition(
+  val state: TimerState,
+  val cues: List<TimerCue> = emptyList(),
+)
 
 /**
  * Pure interval-timer state machine.
@@ -87,7 +99,6 @@ data class TimerTransition(val state: TimerState, val cues: List<TimerCue> = emp
  * elapsed time and for turning [TimerCue]s into sound and vibration.
  */
 object TimerEngine {
-
   fun initialState(config: TimerConfig): TimerState =
     TimerState(config = config, phase = TimerPhase.IDLE, round = 0, remainingMillis = 0L, phaseMillis = 0L, running = false)
 
@@ -103,19 +114,25 @@ object TimerEngine {
     if (state.phase == TimerPhase.IDLE || state.phase == TimerPhase.FINISHED) state else state.copy(running = false)
 
   /** Pauses when running, otherwise starts/resumes. */
-  fun toggle(state: TimerState): TimerTransition =
-    if (state.running) TimerTransition(pause(state)) else start(state)
+  fun toggle(state: TimerState): TimerTransition = if (state.running) TimerTransition(pause(state)) else start(state)
 
   /** Returns a fresh idle state for the given configuration. */
   fun reset(config: TimerConfig): TimerState = initialState(config)
 
   /** Ends the current phase immediately and moves on to the next one. */
   fun skip(state: TimerState): TimerTransition =
-    if (state.phase == TimerPhase.IDLE || state.phase == TimerPhase.FINISHED) TimerTransition(state)
-    else advance(state, overflowMillis = 0L)
+    if (state.phase == TimerPhase.IDLE || state.phase == TimerPhase.FINISHED) {
+      TimerTransition(state)
+    } else {
+      advance(state, overflowMillis = 0L)
+    }
 
   /** Adds [deltaMillis] to the current phase, clamped to [minMillis]. */
-  fun adjustRemaining(state: TimerState, deltaMillis: Long, minMillis: Long = 1_000L): TimerState {
+  fun adjustRemaining(
+    state: TimerState,
+    deltaMillis: Long,
+    minMillis: Long = 1_000L,
+  ): TimerState {
     if (state.phase != TimerPhase.PREPARE && state.phase != TimerPhase.WORK && state.phase != TimerPhase.REST) return state
     val newRemaining = (state.remainingMillis + deltaMillis).coerceAtLeast(minMillis)
     return state.copy(remainingMillis = newRemaining, phaseMillis = maxOf(state.phaseMillis, newRemaining))
@@ -128,7 +145,10 @@ object TimerEngine {
    * boundaries; every crossed threshold and phase change is reflected in the
    * returned cue list.
    */
-  fun tick(state: TimerState, deltaMillis: Long): TimerTransition {
+  fun tick(
+    state: TimerState,
+    deltaMillis: Long,
+  ): TimerTransition {
     if (!state.running || state.phase == TimerPhase.IDLE || state.phase == TimerPhase.FINISHED) {
       return TimerTransition(state)
     }
@@ -174,7 +194,11 @@ object TimerEngine {
       beginWork(TimerState(config = config), round = 1, overflowMillis = 0L)
     }
 
-  private fun beginWork(state: TimerState, round: Int, overflowMillis: Long): TimerTransition =
+  private fun beginWork(
+    state: TimerState,
+    round: Int,
+    overflowMillis: Long,
+  ): TimerTransition =
     TimerTransition(
       state.copy(
         phase = TimerPhase.WORK,
@@ -186,7 +210,11 @@ object TimerEngine {
       listOf(TimerCue.WORK_START),
     )
 
-  private fun beginRest(state: TimerState, round: Int, overflowMillis: Long): TimerTransition =
+  private fun beginRest(
+    state: TimerState,
+    round: Int,
+    overflowMillis: Long,
+  ): TimerTransition =
     TimerTransition(
       state.copy(
         phase = TimerPhase.REST,
@@ -197,7 +225,10 @@ object TimerEngine {
       ),
     )
 
-  private fun advance(state: TimerState, overflowMillis: Long): TimerTransition =
+  private fun advance(
+    state: TimerState,
+    overflowMillis: Long,
+  ): TimerTransition =
     when (state.phase) {
       TimerPhase.PREPARE -> beginWork(state, round = 1, overflowMillis = overflowMillis)
       TimerPhase.WORK -> {
@@ -219,7 +250,11 @@ object TimerEngine {
       TimerPhase.IDLE, TimerPhase.FINISHED -> TimerTransition(state)
     }
 
-  private fun cuesBetween(state: TimerState, beforeMillis: Long, afterMillis: Long): List<TimerCue> {
+  private fun cuesBetween(
+    state: TimerState,
+    beforeMillis: Long,
+    afterMillis: Long,
+  ): List<TimerCue> {
     val config = state.config
     val cues = mutableListOf<TimerCue>()
 

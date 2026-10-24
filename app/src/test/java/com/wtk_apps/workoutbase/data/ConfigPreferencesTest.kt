@@ -11,7 +11,6 @@ import org.junit.Test
  * exist once and be usable for both the active configuration and every saved preset.
  */
 class ConfigPreferencesTest {
-
   private val config =
     TimerConfig(
       rounds = 5,

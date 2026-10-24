@@ -16,7 +16,6 @@ import com.wtk_apps.workoutbase.timer.wholeSeconds
  * of four.
  */
 object ConfigPreferences {
-
   fun keyRounds(prefix: String) = intPreferencesKey("${prefix}rounds")
 
   fun keyWorkSeconds(prefix: String) = intPreferencesKey("${prefix}work_seconds")
@@ -36,7 +35,10 @@ object ConfigPreferences {
   fun keySound(prefix: String) = booleanPreferencesKey("${prefix}sound")
 
   /** Reads a configuration, clamping stored values so bad data cannot crash the app. */
-  fun read(preferences: Preferences, prefix: String): TimerConfig {
+  fun read(
+    preferences: Preferences,
+    prefix: String,
+  ): TimerConfig {
     val defaults = TimerConfig()
     return TimerConfig(
       rounds = (preferences[keyRounds(prefix)] ?: defaults.rounds).coerceIn(1, MAX_ROUNDS),
@@ -60,7 +62,11 @@ object ConfigPreferences {
   }
 
   /** Writes every field of [config] under [prefix], truncating durations to seconds. */
-  fun write(preferences: MutablePreferences, prefix: String, config: TimerConfig) {
+  fun write(
+    preferences: MutablePreferences,
+    prefix: String,
+    config: TimerConfig,
+  ) {
     preferences[keyRounds(prefix)] = config.rounds
     preferences[keyWorkSeconds(prefix)] = wholeSeconds(config.workMillis)
     preferences[keyRestSeconds(prefix)] = wholeSeconds(config.restMillis)
@@ -73,7 +79,10 @@ object ConfigPreferences {
   }
 
   /** Removes every field written under [prefix]. */
-  fun clear(preferences: MutablePreferences, prefix: String) {
+  fun clear(
+    preferences: MutablePreferences,
+    prefix: String,
+  ) {
     keys(prefix).forEach { preferences.remove(it) }
   }
 

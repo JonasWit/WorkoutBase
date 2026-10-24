@@ -5,11 +5,17 @@ enum class CueSound { BEEP, GONG }
 
 /** One step in the reaction to a cue. */
 sealed interface CueStep {
-  data class Sound(val sound: CueSound) : CueStep
+  data class Sound(
+    val sound: CueSound,
+  ) : CueStep
 
-  data class Vibrate(val millis: Long) : CueStep
+  data class Vibrate(
+    val millis: Long,
+  ) : CueStep
 
-  data class Wait(val millis: Long) : CueStep
+  data class Wait(
+    val millis: Long,
+  ) : CueStep
 }
 
 /**

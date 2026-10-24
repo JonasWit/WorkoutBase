@@ -1,7 +1,5 @@
 package com.wtk_apps.workoutbase.ui.timer
 
-import com.wtk_apps.workoutbase.AppGraph
-
 import android.graphics.RuntimeShader
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -27,7 +25,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
@@ -50,8 +47,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
@@ -72,6 +69,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.wtk_apps.workoutbase.AppGraph
 import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.service.TimerService
 import com.wtk_apps.workoutbase.theme.AccentGold
@@ -80,7 +78,6 @@ import com.wtk_apps.workoutbase.theme.PrepareBlue
 import com.wtk_apps.workoutbase.theme.RestGreen
 import com.wtk_apps.workoutbase.theme.Surface2
 import com.wtk_apps.workoutbase.theme.TextPrimary
-import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.theme.workProgressColor
 import com.wtk_apps.workoutbase.timer.TimerConfig
@@ -90,7 +87,6 @@ import com.wtk_apps.workoutbase.timer.formatMillis
 import com.wtk_apps.workoutbase.timer.label
 import com.wtk_apps.workoutbase.timer.sessionSegments
 import com.wtk_apps.workoutbase.timer.totalRemainingMillis
-import com.wtk_apps.workoutbase.timer.totalSessionMillis
 
 /** Roman-inscription style typeface used for the app title. */
 private val RomanTitleFont = FontFamily(Font(R.font.cinzel))
@@ -173,10 +169,14 @@ fun TimerScreen(
 }
 
 @Composable
-private fun BottomLink(text: String, onClick: () -> Unit) {
+private fun BottomLink(
+  text: String,
+  onClick: () -> Unit,
+) {
   Box(
     modifier =
-      Modifier.clip(RoundedCornerShape(50))
+      Modifier
+        .clip(RoundedCornerShape(50))
         .background(Color.Black.copy(alpha = 0.6f))
         .border(1.dp, TextPrimary.copy(alpha = 0.35f), RoundedCornerShape(50))
         .clickable(onClick = onClick)
@@ -187,7 +187,11 @@ private fun BottomLink(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun PhaseHeader(state: TimerState, color: Color, speed: Float) {
+private fun PhaseHeader(
+  state: TimerState,
+  color: Color,
+  speed: Float,
+) {
   Text(
     text = state.phase.label(),
     color = color,
@@ -203,7 +207,13 @@ private fun PhaseHeader(state: TimerState, color: Color, speed: Float) {
     ParamChip("ROUNDS", state.config.rounds.toString(), AccentGold, Modifier.weight(1f))
     ParamChip("WORK", formatMillis(state.config.workMillis), WorkYellow, Modifier.weight(1f), active = state.phase == TimerPhase.WORK)
     ParamChip("REST", formatMillis(state.config.restMillis), RestGreen, Modifier.weight(1f), active = state.phase == TimerPhase.REST)
-    ParamChip("PREP", formatMillis(state.config.prepareMillis), PrepareBlue, Modifier.weight(1f), active = state.phase == TimerPhase.PREPARE)
+    ParamChip(
+      "PREP",
+      formatMillis(state.config.prepareMillis),
+      PrepareBlue,
+      Modifier.weight(1f),
+      active = state.phase == TimerPhase.PREPARE,
+    )
   }
   if (state.round > 0) {
     Spacer(Modifier.height(10.dp))
@@ -347,18 +357,26 @@ private fun ParamChip(
   val borderAlpha = if (active) 0.85f + 0.15f * pulse else 0.7f
   val scale = if (active) 1f + 0.03f * pulse else 1f
 
-  Box(modifier = modifier.graphicsLayer { scaleX = scale; scaleY = scale }) {
+  Box(
+    modifier =
+      modifier.graphicsLayer {
+        scaleX = scale
+        scaleY = scale
+      },
+  ) {
     if (active) {
       Box(
         modifier =
-          Modifier.matchParentSize()
+          Modifier
+            .matchParentSize()
             .border(4.dp, accent.copy(alpha = glowAlpha), shape)
             .blur(13.dp),
       )
     }
     Column(
       modifier =
-        Modifier.fillMaxWidth()
+        Modifier
+          .fillMaxWidth()
           .clip(shape)
           .background(Surface2.copy(alpha = if (active) 1f else 0.75f))
           .border(borderWidth, accent.copy(alpha = borderAlpha), shape)
@@ -372,7 +390,12 @@ private fun ParamChip(
 }
 
 @Composable
-private fun TimerDial(state: TimerState, color: Color, progress: Float, size: Dp) {
+private fun TimerDial(
+  state: TimerState,
+  color: Color,
+  progress: Float,
+  size: Dp,
+) {
   Box(modifier = Modifier.size(size), contentAlignment = Alignment.Center) {
     Canvas(modifier = Modifier.fillMaxSize()) {
       val stroke = this.size.minDimension * 0.058f
@@ -482,16 +505,14 @@ private fun phaseColor(state: TimerState): Color {
 }
 
 /**
- * Animated flame tongues rising from the bottom of the screen, tinted with the
- * phase colour. Purely procedural: flickering vertical-gradient ovals combined
- * with additive blending so overlapping flames glow.
- */
-/**
  * Natural-looking fire drawn with an AGSL fragment shader (Android 13+). On
  * older devices it falls back to the procedural flame shapes.
  */
 @Composable
-private fun FlameBackground(color: Color, speed: Float) {
+private fun FlameBackground(
+  color: Color,
+  speed: Float,
+) {
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
     FireShaderBackground(color, speed)
   } else {
@@ -563,7 +584,10 @@ half4 main(float2 fragCoord) {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-private fun FireShaderBackground(color: Color, speed: Float) {
+private fun FireShaderBackground(
+  color: Color,
+  speed: Float,
+) {
   // Accumulate flame time by integrating the current speed, so changing the pace
   // (e.g. entering a work round) never makes the flames jump.
   val fireTime = remember { mutableFloatStateOf(0f) }
@@ -595,6 +619,11 @@ private fun FireShaderBackground(color: Color, speed: Float) {
   }
 }
 
+/**
+ * Animated flame tongues rising from the bottom of the screen, tinted with the
+ * phase colour. Purely procedural: flickering vertical-gradient ovals combined
+ * with additive blending so overlapping flames glow.
+ */
 @Composable
 private fun ProceduralFlameBackground(color: Color) {
   val transition = rememberInfiniteTransition(label = "flames")
@@ -634,8 +663,22 @@ private fun ProceduralFlameBackground(color: Color) {
       val path =
         Path().apply {
           moveTo(x - flameWidth / 2f, h)
-          cubicTo(x - flameWidth * 0.45f, h - flameHeight * 0.35f, x - flameWidth * 0.2f + lean * 0.5f, top + flameHeight * 0.3f, x + lean, top)
-          cubicTo(x + flameWidth * 0.2f + lean * 0.5f, top + flameHeight * 0.3f, x + flameWidth * 0.45f, h - flameHeight * 0.35f, x + flameWidth / 2f, h)
+          cubicTo(
+            x - flameWidth * 0.45f,
+            h - flameHeight * 0.35f,
+            x - flameWidth * 0.2f + lean * 0.5f,
+            top + flameHeight * 0.3f,
+            x + lean,
+            top,
+          )
+          cubicTo(
+            x + flameWidth * 0.2f + lean * 0.5f,
+            top + flameHeight * 0.3f,
+            x + flameWidth * 0.45f,
+            h - flameHeight * 0.35f,
+            x + flameWidth / 2f,
+            h,
+          )
           close()
         }
       drawPath(

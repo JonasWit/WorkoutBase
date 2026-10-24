@@ -9,4 +9,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object Trainings : NavKey
 
-@Serializable data class EditTraining(val index: Int) : NavKey
+@Serializable data class EditTraining(
+  val index: Int,
+) : NavKey

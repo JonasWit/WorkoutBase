@@ -1,7 +1,10 @@
 package com.wtk_apps.workoutbase.timer
 
 /** A duration split into the parts a person edits: whole minutes and seconds 0..59. */
-data class DurationParts(val minutes: Int, val seconds: Int) {
+data class DurationParts(
+  val minutes: Int,
+  val seconds: Int,
+) {
   init {
     require(minutes >= 0) { "minutes must not be negative" }
     require(seconds in 0..59) { "seconds must be in 0..59" }
@@ -27,7 +30,10 @@ fun durationParts(millis: Long): DurationParts {
 }
 
 /** Rebuilds milliseconds from the parts a person edited. */
-fun millisFromParts(minutes: Int, seconds: Int): Long {
+fun millisFromParts(
+  minutes: Int,
+  seconds: Int,
+): Long {
   require(minutes >= 0) { "minutes must not be negative" }
   require(seconds in 0..59) { "seconds must be in 0..59" }
   return (minutes * 60L + seconds) * 1_000L

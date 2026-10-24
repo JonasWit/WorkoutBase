@@ -8,7 +8,6 @@ import org.junit.Test
  * configuration form. Truncation is deliberate: stored durations are whole seconds.
  */
 class DurationTest {
-
   @Test
   fun wholeSeconds_truncatesTowardsZero() {
     assertEquals(5, wholeSeconds(5_999L))
