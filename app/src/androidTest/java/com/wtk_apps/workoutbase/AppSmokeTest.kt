@@ -25,10 +25,11 @@ import org.junit.runners.model.Statement
  */
 @RunWith(AndroidJUnit4::class)
 class AppSmokeTest {
+  @get:Rule(order = 0)
+  val notificationPermission: TestRule = ShellGrantRule(Manifest.permission.POST_NOTIFICATIONS)
 
-  @get:Rule(order = 0) val notificationPermission: TestRule = ShellGrantRule(Manifest.permission.POST_NOTIFICATIONS)
-
-  @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
+  @get:Rule(order = 1)
+  val compose = createAndroidComposeRule<MainActivity>()
 
   @Test
   fun timerScreen_showsTitleAndNavigation() {
@@ -56,9 +57,13 @@ class AppSmokeTest {
 }
 
 /** Grants a runtime permission from the shell before the activity launches. */
-private class ShellGrantRule(private val permission: String) : TestRule {
-
-  override fun apply(base: Statement, description: Description): Statement =
+private class ShellGrantRule(
+  private val permission: String,
+) : TestRule {
+  override fun apply(
+    base: Statement,
+    description: Description,
+  ): Statement =
     object : Statement() {
       override fun evaluate() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
