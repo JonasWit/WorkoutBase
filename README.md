@@ -1,71 +1,63 @@
 # WorkoutBase
 
-Aplikacja Android do prowadzenia treningów interwałowych: przygotowanie, rundy pracy i przerwy,
-sygnały dźwiękowe i wibracyjne, presety treningów oraz timer działający przy zgaszonym ekranie.
+Interwałowy timer treningowy na Androida: przygotowanie, rundy pracy i przerwy, sygnały
+dźwiękowe i wibracyjne, zapisane treningi oraz praca przy zgaszonym ekranie.
 
-Kotlin, Jetpack Compose, jeden moduł `app`.
+## Funkcje
 
-## Pętla pracy
+**Timer interwałowy**
 
-Szybka pętla podczas pisania kodu — tylko testy jednostkowe, bez statycznej analizy (kilkanaście sekund):
+- fazy: przygotowanie, praca, przerwa i zakończenie, z automatycznym przejściem do kolejnej rundy
+- konfiguracja liczby rund oraz długości pracy, przerwy i przygotowania
+- odliczanie 3-2-1 przed każdą rundą, z możliwością wyłączenia
+- sygnał w połowie rundy pracy, z możliwością wyłączenia
+- start, pauza, wznowienie, reset i pomijanie fazy
+- szybkie wydłużanie i skracanie bieżącej fazy o 15 sekund
 
-```sh
-./gradlew fastTest --offline
-```
+**Podczas treningu**
 
-Pełne sprawdzenie przed commitem — ktlint, detekt, Android Lint i testy:
+- duże odliczanie czytelne z kilku metrów
+- pierścień postępu bieżącej fazy
+- segmentowy pasek całej sesji z podziałem na przygotowanie, pracę i przerwy
+- animowane tło płomieni, którego kolor i tempo zależą od fazy
+- dźwięki i wibracje dla startu pracy, końca rundy, połowy i zakończenia treningu
+- ekran nie gaśnie w trakcie sesji
+- timer działa dalej przy zgaszonym ekranie, z powiadomieniem pokazującym pozostały czas
 
-```sh
-./gradlew check --offline
-```
-Testy UI działają w `fastTest` przez Robolectric — bez emulatora. Emulator uruchamiaj tylko wtedy, gdy trzeba zobaczyć wygląd; nie uruchamiaj testów instrumentalnych na telefonie z danymi użytkownika.
+**Zapisane treningi**
 
-## Hook
+- zapisanie bieżącej konfiguracji jako trening z nazwą
+- do 20 zapisanych treningów
+- podgląd parametrów, wczytanie, edycja i usuwanie
+- eksport wszystkich treningów do pliku JSON i import z pliku
+- import pokazuje, ile treningów dodano, a ile pominięto z powodu limitu
 
-Hook blokujący commity bez dowodu — włącz raz na klon:
+**Interfejs**
 
-```sh
-git config core.hooksPath .githooks
-```
+- cztery ekrany: timer, ustawienia, lista treningów i edycja treningu
+- wszystkie teksty po polsku i angielsku w kodzie źródłowym zasobów
+- numer wersji widoczny pod tytułem na ekranie głównym
 
-## Wersjonowanie
+## Instalacja
 
-- `versionName` jest semantyczny: `major.minor.patch` — pilnuje tego test.
-- **Każda zmiana podbija wersję w tym samym commicie.** `versionCode` zawsze +1, `versionName` jako `major.minor.patch`: patch przy poprawkach, minor przy nowym zachowaniu, major przy zmianie niekompatybilnej. Wersja nigdy nie maleje i nie jest reużywana.
-- Wersja jest pokazywana pod tytułem na ekranie głównym i pochodzi z builda (`BuildConfig`), więc nie rozjeżdża się z manifestem.
-## Wydanie
+Pobierz plik `app-release.apk` z zakładki
+[Releases](https://github.com/JonasWit/workoutbase/releases) i otwórz go na telefonie.
+Android może poprosić o zgodę na instalację z nieznanego źródła.
 
-Build release jest podpisywany kluczem wskazanym w `keystore.properties` (plik poza repozytorium, w `.gitignore`):
+Jeśli masz zainstalowaną starszą wersję podpisaną innym kluczem, system odmówi aktualizacji.
+Wtedy: `Trainings` → `EXPORT`, odinstalowanie starej wersji, instalacja nowej, `IMPORT`.
 
-```sh
-./gradlew assembleRelease
-```
+## Pierwsze kroki
 
-Wynik: `app/build/outputs/apk/release/app-release.apk`.
+1. Wejdź w `Settings`, ustaw rundy oraz czasy pracy, przerwy i przygotowania, zapisz.
+2. Na ekranie timera naciśnij start.
+3. Aby zachować konfigurację, wejdź w `Trainings` i zapisz ją pod nazwą.
 
-- Keystore: `~/.android/keystores/workoutbase-release.jks`. **Zrób jego kopię poza tym komputerem** — bez niego nie wydasz aktualizacji.
-- Bez `keystore.properties` build release powstanie niepodpisany i nie da się go zainstalować.
-- Zmiana klucza wymaga odinstalowania aplikacji, a to kasuje dane. Przed zmianą podpisu zrób `Trainings → EXPORT`.
-## Struktura
+## Dane i prywatność
 
-| Katalog | Zawartość |
-| --- | --- |
-| `timer/` | Czysty rdzeń timera (`TimerEngine`, `TimerFormat`), kontroler i adapter dźwięku |
-| `data/` | Zapis konfiguracji i presetów w DataStore |
-| `ui/` | Ekrany Compose |
-| `service/` | Foreground service i powiadomienie |
-| `app/src/test/` | Testy jednostkowe rdzenia |
-
-## Zasady
-
-Reguły pisania kodu są w osobnym repozytorium:
-[ai_stuff/docs/zasady-ai.md](https://github.com/JonasWit/ai_stuff/blob/main/docs/zasady-ai.md).
-Skrót dla tego projektu: `AGENTS.md`.
-
-## Znany dług techniczny
-
-Wymieniony w `AGENTS.md`, w sekcji „Known debt”. To lista rzeczy do naprawy, nie opis
-docelowej architektury — nie naprawiaj ich przy okazji innych zmian.
+Wszystkie dane zostają na urządzeniu. Aplikacja nie ma konta, logowania ani połączenia z siecią.
+Treningi są przechowywane lokalnie, a jedynym sposobem ich przeniesienia jest ręczny eksport
+do pliku JSON.
 
 ## Licencja
 
