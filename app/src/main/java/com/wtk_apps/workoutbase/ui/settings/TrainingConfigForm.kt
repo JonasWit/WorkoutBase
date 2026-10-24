@@ -46,7 +46,10 @@ import com.wtk_apps.workoutbase.theme.Outline1
 import com.wtk_apps.workoutbase.theme.Surface2
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
+import com.wtk_apps.workoutbase.timer.DurationParts
 import com.wtk_apps.workoutbase.timer.TimerConfig
+import com.wtk_apps.workoutbase.timer.durationParts
+import com.wtk_apps.workoutbase.timer.millisFromParts
 
 /**
  * The session/cues form, shared between the global Settings screen and the
@@ -69,34 +72,28 @@ internal fun TrainingConfigForm(
       onConfigChange(config.copy(rounds = it))
     }
 
-    val workMin = (config.workMillis / 60_000L).toInt()
-    val workSec = ((config.workMillis / 1_000L) % 60L).toInt()
-    TimeField(
+    val work = durationParts(config.workMillis)
+    DurationFields(
       label = "Work",
-      minutes = workMin,
-      seconds = workSec,
-      onMinutes = { onConfigChange(config.copy(workMillis = (it * 60L + workSec).coerceAtLeast(1L) * 1_000L)) },
-      onSeconds = { onConfigChange(config.copy(workMillis = (workMin * 60L + it).coerceAtLeast(1L) * 1_000L)) },
+      parts = work,
+      minimumMillis = 1_000L,
+      onChange = { onConfigChange(config.copy(workMillis = it)) },
     )
 
-    val restMin = (config.restMillis / 60_000L).toInt()
-    val restSec = ((config.restMillis / 1_000L) % 60L).toInt()
-    TimeField(
+    val rest = durationParts(config.restMillis)
+    DurationFields(
       label = "Rest",
-      minutes = restMin,
-      seconds = restSec,
-      onMinutes = { onConfigChange(config.copy(restMillis = (it * 60L + restSec) * 1_000L)) },
-      onSeconds = { onConfigChange(config.copy(restMillis = (restMin * 60L + it) * 1_000L)) },
+      parts = rest,
+      minimumMillis = 0L,
+      onChange = { onConfigChange(config.copy(restMillis = it)) },
     )
 
-    val prepMin = (config.prepareMillis / 60_000L).toInt()
-    val prepSec = ((config.prepareMillis / 1_000L) % 60L).toInt()
-    TimeField(
+    val prepare = durationParts(config.prepareMillis)
+    DurationFields(
       label = "Prepare",
-      minutes = prepMin,
-      seconds = prepSec,
-      onMinutes = { onConfigChange(config.copy(prepareMillis = (it * 60L + prepSec) * 1_000L)) },
-      onSeconds = { onConfigChange(config.copy(prepareMillis = (prepMin * 60L + it) * 1_000L)) },
+      parts = prepare,
+      minimumMillis = 0L,
+      onChange = { onConfigChange(config.copy(prepareMillis = it)) },
     )
 
     Spacer(Modifier.height(16.dp))
@@ -152,6 +149,22 @@ private fun SingleNumberField(label: String, value: Int, range: IntRange, onChan
 }
 
 /** Minutes + seconds fields, each edited through a modal. */
+@Composable
+private fun DurationFields(
+  label: String,
+  parts: DurationParts,
+  minimumMillis: Long,
+  onChange: (Long) -> Unit,
+) {
+  TimeField(
+    label = label,
+    minutes = parts.minutes,
+    seconds = parts.seconds,
+    onMinutes = { onChange(maxOf(millisFromParts(it, parts.seconds), minimumMillis)) },
+    onSeconds = { onChange(maxOf(millisFromParts(parts.minutes, it), minimumMillis)) },
+  )
+}
+
 @Composable
 private fun TimeField(
   label: String,
