@@ -42,14 +42,14 @@
     <ID>MagicNumber:TimerFormat.kt$999L</ID>
     <ID>MagicNumber:WorkoutBaseApp.kt$AppGraph$1_000_000L</ID>
     <ID>MatchingDeclarationName:Duration.kt$DurationParts</ID>
+    <ID>MaxLineLength:ConfigFields.kt$FormDialogButton("CANCEL", filled = false, accent = TextSecondary, modifier = Modifier.weight(1f), onClick = onDismiss)</ID>
     <ID>MaxLineLength:EditTrainingScreen.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
     <ID>MaxLineLength:FlameBackground.kt$brush = Brush.verticalGradient(listOf(Color.Transparent, color.copy(alpha = 0.12f)), startY = h * 0.80f, endY = h)</ID>
     <ID>MaxLineLength:SettingsScreen.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
     <ID>MaxLineLength:TimerComponents.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
     <ID>MaxLineLength:TimerEngine.kt$TimerEngine$TimerState(config = config, phase = TimerPhase.IDLE, round = 0, remainingMillis = 0L, phaseMillis = 0L, running = false)</ID>
     <ID>MaxLineLength:TimerEngine.kt$TimerEngine$if (state.phase != TimerPhase.PREPARE &amp;&amp; state.phase != TimerPhase.WORK &amp;&amp; state.phase != TimerPhase.REST) return state</ID>
-    <ID>MaxLineLength:TrainingConfigForm.kt$FormDialogButton("CANCEL", filled = false, accent = TextSecondary, modifier = Modifier.weight(1f), onClick = onDismiss)</ID>
-    <ID>MaxLineLength:TrainingsScreen.kt$Text(preset.name, color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, modifier = Modifier.weight(1f))</ID>
+    <ID>MaxLineLength:TrainingsComponents.kt$Text(preset.name, color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, modifier = Modifier.weight(1f))</ID>
     <ID>MaxLineLength:TrainingsScreen.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
     <ID>NestedBlockDepth:TimerEngine.kt$TimerEngine$private fun cuesBetween( state: TimerState, beforeMillis: Long, afterMillis: Long, ): List&lt;TimerCue&gt;</ID>
     <ID>ReturnCount:AndroidCuePlayer.kt$AndroidCuePlayer$private fun vibrate( durationMs: Long, config: TimerConfig, )</ID>
