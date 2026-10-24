@@ -31,16 +31,18 @@ Read it before writing code. This file only records what is specific to this pro
 
 ## Known debt (do not fix unless the task touches it)
 
-- `TimerController` and `AppGraph` are mutable app-scoped globals; there are no
-  ViewModels, so screens call them directly. Target: controller as a class with an
-  injected time source, owned by a ViewModel.
-- `SettingsRepository` maps `TimerConfig` to preferences in four places. Target: one
-  prefixed mapping used for both the active config and presets.
-- Duration conversion between minutes/seconds exists in several places. Target: one
-  pure conversion used by UI and persistence.
+- `AppGraph` is a mutable app-scoped holder and there are no ViewModels, so screens call
+  it directly and the timer instance is not tied to app visibility. Target: controller
+  owned by a ViewModel, dependencies passed explicitly.
 - User-facing strings are hardcoded in Compose. Target: `strings.xml`.
 - `TimerScreen.kt` mixes the timer UI with procedural flame rendering. Target: split
   by topic.
+- No static analysis beyond Android Lint and no CI: `./gradlew check` and the
+  `commit-msg` hook run only when someone runs them locally.
+
+Fixed and removed from this list: `TimerController` now takes an injected clock and has
+tests; configuration mapping lives in `ConfigPreferences`; duration conversion lives in
+`Duration.kt`; cue behaviour lives in `cuePlan` with tests.
 
 ## Boundaries
 
