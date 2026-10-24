@@ -45,7 +45,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.wtk_apps.workoutbase.AppGraph
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.service.TimerService
 import com.wtk_apps.workoutbase.theme.AccentGold
@@ -57,6 +57,7 @@ import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.timer.TimerConfig
 import com.wtk_apps.workoutbase.timer.TimerPhase
 import com.wtk_apps.workoutbase.timer.sessionSegments
+import com.wtk_apps.workoutbase.ui.TimerViewModel
 import com.wtk_apps.workoutbase.ui.effects.FlameBackground
 
 /** Roman-inscription style typeface used for the app title. */
@@ -67,8 +68,9 @@ fun TimerScreen(
   onOpenSettings: () -> Unit,
   onOpenTrainings: () -> Unit,
   modifier: Modifier = Modifier,
+  viewModel: TimerViewModel = viewModel(factory = TimerViewModel.factory()),
 ) {
-  val state by AppGraph.timer.state.collectAsStateWithLifecycle()
+  val state by viewModel.state.collectAsStateWithLifecycle()
   val context = LocalContext.current
 
   // Keep the timer alive with a foreground service while it is running.
