@@ -55,6 +55,7 @@ tests; configuration mapping lives in `ConfigPreferences`; duration conversion l
 - One change, one purpose. Report unrelated problems instead of fixing them in the
   same diff.
 - New dependency needs a justification: what the standard library or Compose cannot do.
+- Versioning: `versionName` is `major.minor.patch` (a test enforces it); bump `versionCode` by one on every release.
 - Do not guess Android APIs. Check the version in `gradle/libs.versions.toml` first.
 - Never run instrumented tests against a phone that holds real user data:
   `connectedDebugAndroidTest` uninstalls the app and wipes its DataStore. Use the

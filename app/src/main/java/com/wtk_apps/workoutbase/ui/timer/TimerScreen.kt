@@ -55,6 +55,7 @@ import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.timer.TimerConfig
 import com.wtk_apps.workoutbase.timer.TimerPhase
 import com.wtk_apps.workoutbase.timer.sessionSegments
+import com.wtk_apps.workoutbase.ui.AppVersion
 import com.wtk_apps.workoutbase.ui.TimerViewModel
 import com.wtk_apps.workoutbase.ui.effects.FlameBackground
 
@@ -100,15 +101,7 @@ fun TimerScreen(
       modifier = Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 16.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      // Roman title, single line.
-      Text(
-        text = stringResource(R.string.title_workout_base),
-        color = AccentGold,
-        fontFamily = RomanTitleFont,
-        fontSize = 22.sp,
-        letterSpacing = 3.sp,
-        modifier = Modifier.padding(top = 8.dp),
-      )
+      TimerTitle()
 
       // Phase label + dial, centred in the space between title and controls.
       BoxWithConstraints(
@@ -236,3 +229,17 @@ private fun segmentColor(phase: TimerPhase): Color =
     TimerPhase.REST -> RestGreen
     else -> WorkYellow
   }
+
+/** App title with the version of the installed build underneath. */
+@Composable
+private fun TimerTitle() {
+  Text(
+    text = stringResource(R.string.title_workout_base),
+    color = AccentGold,
+    fontFamily = RomanTitleFont,
+    fontSize = 22.sp,
+    letterSpacing = 3.sp,
+    modifier = Modifier.padding(top = 8.dp),
+  )
+  AppVersion()
+}

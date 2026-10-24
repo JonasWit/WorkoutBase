@@ -28,6 +28,11 @@ Hook blokujący commity bez dowodu — włącz raz na klon:
 git config core.hooksPath .githooks
 ```
 
+## Wersjonowanie
+
+- `versionName` jest semantyczny: `major.minor.patch` — pilnuje tego test.
+- `versionCode` rośnie o 1 przy każdym wydaniu i nigdy nie maleje.
+- Wersja jest pokazywana pod tytułem na ekranie głównym i pochodzi z builda (`BuildConfig`), więc nie rozjeżdża się z manifestem.
 ## Struktura
 
 | Katalog | Zawartość |
