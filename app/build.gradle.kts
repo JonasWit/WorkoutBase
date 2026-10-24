@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
@@ -6,20 +9,41 @@ plugins {
   alias(libs.plugins.detekt)
 }
 
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties =
+  Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+      FileInputStream(keystorePropertiesFile).use { load(it) }
+    }
+  }
+
 android {
+  signingConfigs {
+    if (keystorePropertiesFile.exists()) {
+      create("release") {
+        storeFile = file(keystoreProperties.getProperty("storeFile"))
+        storePassword = keystoreProperties.getProperty("storePassword")
+        keyAlias = keystoreProperties.getProperty("keyAlias")
+        keyPassword = keystoreProperties.getProperty("keyPassword")
+      }
+    }
+  }
   namespace = "com.wtk_apps.workoutbase"
   compileSdk = 36
   defaultConfig {
     applicationId = "com.wtk_apps.workoutbase"
     minSdk = 24
     targetSdk = 36
-    versionCode = 3
-    versionName = "1.0.1"
+    versionCode = 4
+    versionName = "1.0.2"
   }
 
   buildTypes {
     release {
       isMinifyEnabled = false
+      if (keystorePropertiesFile.exists()) {
+        signingConfig = signingConfigs.getByName("release")
+      }
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
