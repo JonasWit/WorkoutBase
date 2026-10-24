@@ -1,0 +1,2 @@
+# Hooks run through sh; CRLF would break them on every platform.
+.githooks/* text eol=lf

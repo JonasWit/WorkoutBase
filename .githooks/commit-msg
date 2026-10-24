@@ -1,0 +1,29 @@
+#!/bin/sh
+# Rejects commits that carry no evidence.
+# Required: one line starting with "Test:" or "Unverified:".
+# Rules: https://github.com/JonasWit/ai_stuff/blob/main/docs/zasady-ai.md
+
+msg_file="$1"
+
+if [ -z "$msg_file" ] || [ ! -f "$msg_file" ]; then
+  echo "commit-msg: cannot read the commit message file" >&2
+  exit 1
+fi
+
+if grep -qE '^(Test|Unverified):[[:space:]]*[^[:space:]]' "$msg_file"; then
+  exit 0
+fi
+
+subject=$(head -n 1 "$msg_file")
+case "$subject" in
+  Merge*|Revert*|"Initial commit"*) exit 0 ;;
+esac
+
+echo "" >&2
+echo "commit-msg: missing evidence trailer." >&2
+echo "Add one of these lines to the commit message:" >&2
+echo "  Test: <test name that proves the change>" >&2
+echo "  Unverified: <what was not verified and why>" >&2
+echo "" >&2
+echo "Rules: AGENTS.md and https://github.com/JonasWit/ai_stuff/blob/main/docs/zasady-ai.md" >&2
+exit 1
