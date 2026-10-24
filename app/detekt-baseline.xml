@@ -4,8 +4,8 @@
   <CurrentIssues>
     <ID>ComplexCondition:TimerEngine.kt$TimerEngine$config.halfWayEnabled &amp;&amp; half &gt; 0L &amp;&amp; beforeMillis &gt; half &amp;&amp; afterMillis &lt;= half</ID>
     <ID>CyclomaticComplexMethod:TimerEngine.kt$TimerEngine$private fun cuesBetween( state: TimerState, beforeMillis: Long, afterMillis: Long, ): List&lt;TimerCue&gt;</ID>
-    <ID>LongMethod:TimerScreen.kt$@Composable private fun ProceduralFlameBackground(color: Color)</ID>
-    <ID>LongMethod:TimerScreen.kt$@Composable private fun SessionProgressBar( config: TimerConfig, remainingMillis: Long, speed: Float, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:FlameBackground.kt$@Composable private fun ProceduralFlameBackground(color: Color)</ID>
+    <ID>LongMethod:TimerScreen.kt$@Composable internal fun SessionProgressBar( config: TimerConfig, remainingMillis: Long, speed: Float, modifier: Modifier = Modifier, )</ID>
     <ID>LongMethod:TrainingsScreen.kt$@Composable fun TrainingsScreen( onBack: () -&gt; Unit, onEdit: (Int) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>LongParameterList:TimerEngineTest.kt$TimerEngineTest$( rounds: Int = 3, workMillis: Long = 10_000L, restMillis: Long = 5_000L, prepareMillis: Long = 0L, halfWayEnabled: Boolean = true, countdownEnabled: Boolean = true, )</ID>
     <ID>MagicNumber:AndroidCuePlayer.kt$AndroidCuePlayer$150L</ID>
@@ -30,6 +30,7 @@
     <ID>MagicNumber:Duration.kt$60L</ID>
     <ID>MagicNumber:Duration.kt$DurationParts$59</ID>
     <ID>MagicNumber:Duration.kt$DurationParts$60</ID>
+    <ID>MagicNumber:FlameBackground.kt$43758.5453f</ID>
     <ID>MagicNumber:TimerColors.kt$0.5f</ID>
     <ID>MagicNumber:TimerColors.kt$180f</ID>
     <ID>MagicNumber:TimerColors.kt$3</ID>
@@ -39,17 +40,14 @@
     <ID>MagicNumber:TimerFormat.kt$1_000L</ID>
     <ID>MagicNumber:TimerFormat.kt$60L</ID>
     <ID>MagicNumber:TimerFormat.kt$999L</ID>
-    <ID>MagicNumber:TimerScreen.kt$43758.5453f</ID>
     <ID>MagicNumber:WorkoutBaseApp.kt$AppGraph$1_000_000L</ID>
     <ID>MatchingDeclarationName:Duration.kt$DurationParts</ID>
     <ID>MaxLineLength:EditTrainingScreen.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
+    <ID>MaxLineLength:FlameBackground.kt$brush = Brush.verticalGradient(listOf(Color.Transparent, color.copy(alpha = 0.12f)), startY = h * 0.80f, endY = h)</ID>
     <ID>MaxLineLength:SettingsScreen.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
+    <ID>MaxLineLength:TimerComponents.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
     <ID>MaxLineLength:TimerEngine.kt$TimerEngine$TimerState(config = config, phase = TimerPhase.IDLE, round = 0, remainingMillis = 0L, phaseMillis = 0L, running = false)</ID>
     <ID>MaxLineLength:TimerEngine.kt$TimerEngine$if (state.phase != TimerPhase.PREPARE &amp;&amp; state.phase != TimerPhase.WORK &amp;&amp; state.phase != TimerPhase.REST) return state</ID>
-    <ID>MaxLineLength:TimerScreen.kt$ParamChip("REST", formatMillis(state.config.restMillis), RestGreen, Modifier.weight(1f), active = state.phase == TimerPhase.REST)</ID>
-    <ID>MaxLineLength:TimerScreen.kt$ParamChip("WORK", formatMillis(state.config.workMillis), WorkYellow, Modifier.weight(1f), active = state.phase == TimerPhase.WORK)</ID>
-    <ID>MaxLineLength:TimerScreen.kt$brush = Brush.verticalGradient(listOf(Color.Transparent, color.copy(alpha = 0.12f)), startY = h * 0.80f, endY = h)</ID>
-    <ID>MaxLineLength:TimerScreen.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
     <ID>MaxLineLength:TrainingConfigForm.kt$FormDialogButton("CANCEL", filled = false, accent = TextSecondary, modifier = Modifier.weight(1f), onClick = onDismiss)</ID>
     <ID>MaxLineLength:TrainingsScreen.kt$Text(preset.name, color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, modifier = Modifier.weight(1f))</ID>
     <ID>MaxLineLength:TrainingsScreen.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
@@ -57,6 +55,5 @@
     <ID>ReturnCount:AndroidCuePlayer.kt$AndroidCuePlayer$private fun vibrate( durationMs: Long, config: TimerConfig, )</ID>
     <ID>TooManyFunctions:ConfigPreferences.kt$ConfigPreferences</ID>
     <ID>TooManyFunctions:TimerEngine.kt$TimerEngine</ID>
-    <ID>TooManyFunctions:TimerScreen.kt$com.wtk_apps.workoutbase.ui.timer.TimerScreen.kt</ID>
   </CurrentIssues>
 </SmellBaseline>
