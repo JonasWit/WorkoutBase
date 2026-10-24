@@ -31,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.wtk_apps.workoutbase.AppGraph
 import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.PrepareBlue
@@ -128,14 +127,17 @@ internal fun PhaseHeader(
 /** Small parameter chip with a border in its phase colour; the active phase glows. */
 
 @Composable
-internal fun Controls(state: TimerState) {
+internal fun Controls(
+  state: TimerState,
+  actions: TimerActions,
+) {
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.spacedBy(12.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
     OutlinedButton(
-      onClick = { AppGraph.timer.reset() },
+      onClick = actions.onReset,
       modifier = Modifier.width(92.dp),
       contentPadding = PaddingValues(horizontal = 8.dp),
     ) {
@@ -143,13 +145,13 @@ internal fun Controls(state: TimerState) {
     }
     val primaryLabel =
       when {
-        state.running -> "PAUSE"
-        state.phase == TimerPhase.FINISHED -> "AGAIN"
-        state.phase == TimerPhase.IDLE -> "START"
-        else -> "RESUME"
+        state.running -> stringResource(R.string.action_pause)
+        state.phase == TimerPhase.FINISHED -> stringResource(R.string.action_again)
+        state.phase == TimerPhase.IDLE -> stringResource(R.string.action_start)
+        else -> stringResource(R.string.action_resume)
       }
     Button(
-      onClick = { AppGraph.timer.toggle() },
+      onClick = actions.onToggle,
       modifier = Modifier.weight(1f).height(56.dp),
       contentPadding = PaddingValues(horizontal = 8.dp),
       colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),
@@ -164,7 +166,7 @@ internal fun Controls(state: TimerState) {
       )
     }
     OutlinedButton(
-      onClick = { AppGraph.timer.skip() },
+      onClick = actions.onSkip,
       modifier = Modifier.width(92.dp),
       contentPadding = PaddingValues(horizontal = 8.dp),
     ) {
@@ -184,3 +186,31 @@ internal fun phaseColor(state: TimerState): Color {
     }
   return animateColorAsState(target, tween(400), label = "phaseColor").value
 }
+
+/** Controls and navigation links pinned to the bottom of the timer screen. */
+@Composable
+internal fun TimerFooter(
+  state: TimerState,
+  actions: TimerActions,
+) {
+  Controls(state = state, actions = actions)
+  Spacer(Modifier.height(10.dp))
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    BottomLink(stringResource(R.string.title_trainings), actions.onOpenTrainings)
+    BottomLink(stringResource(R.string.title_settings), actions.onOpenSettings)
+  }
+  Spacer(Modifier.height(4.dp))
+}
+
+/** User actions the timer screen exposes; grouped so composables stay small. */
+data class TimerActions(
+  val onReset: () -> Unit,
+  val onToggle: () -> Unit,
+  val onSkip: () -> Unit,
+  val onOpenTrainings: () -> Unit,
+  val onOpenSettings: () -> Unit,
+)

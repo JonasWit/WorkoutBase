@@ -4,11 +4,9 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -125,18 +123,17 @@ fun TimerScreen(
         }
       }
 
-      // Controls + links, pinned to the bottom.
-      Controls(state = state)
-      Spacer(Modifier.height(10.dp))
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        BottomLink(stringResource(R.string.title_trainings), onOpenTrainings)
-        BottomLink(stringResource(R.string.title_settings), onOpenSettings)
-      }
-      Spacer(Modifier.height(4.dp))
+      TimerFooter(
+        state = state,
+        actions =
+          TimerActions(
+            onReset = viewModel::reset,
+            onToggle = viewModel::toggle,
+            onSkip = viewModel::skip,
+            onOpenTrainings = onOpenTrainings,
+            onOpenSettings = onOpenSettings,
+          ),
+      )
     }
   }
 }
