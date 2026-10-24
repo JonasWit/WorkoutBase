@@ -18,7 +18,7 @@ Pełne sprawdzenie przed commitem — ktlint, detekt, Android Lint i testy:
 ```sh
 ./gradlew check --offline
 ```
-Emulator uruchamiaj tylko wtedy, gdy trzeba zobaczyć UI; nie uruchamiaj testów instrumentalnych na telefonie z danymi użytkownika.
+Testy UI działają w `fastTest` przez Robolectric — bez emulatora. Emulator uruchamiaj tylko wtedy, gdy trzeba zobaczyć wygląd; nie uruchamiaj testów instrumentalnych na telefonie z danymi użytkownika.
 
 ## Hook
 
