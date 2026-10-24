@@ -2,6 +2,7 @@ package com.wtk_apps.workoutbase.ui.timer
 
 import android.graphics.RuntimeShader
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -559,6 +560,7 @@ half4 main(float2 fragCoord) {
 }
 """
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 private fun FireShaderBackground(color: Color, speed: Float) {
   // Accumulate flame time by integrating the current speed, so changing the pace

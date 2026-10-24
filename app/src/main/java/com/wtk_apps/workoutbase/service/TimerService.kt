@@ -11,6 +11,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.wtk_apps.workoutbase.MainActivity
@@ -42,7 +43,7 @@ class TimerService : Service() {
 
   override fun onCreate() {
     super.onCreate()
-    createChannel()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) createChannel()
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -97,6 +98,7 @@ class TimerService : Service() {
       .build()
   }
 
+  @RequiresApi(Build.VERSION_CODES.O)
   private fun createChannel() {
     val manager = getSystemService(NotificationManager::class.java) ?: return
     if (manager.getNotificationChannel(CHANNEL_ID) != null) return
