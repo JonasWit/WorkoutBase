@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,20 +26,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.wtk_apps.workoutbase.AppGraph
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
-import kotlinx.coroutines.launch
+import com.wtk_apps.workoutbase.ui.SettingsViewModel
 
 @Composable
 fun SettingsScreen(
   onBack: () -> Unit,
   modifier: Modifier = Modifier,
+  viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.factory()),
 ) {
-  val scope = rememberCoroutineScope()
-  var config by remember { mutableStateOf(AppGraph.timer.state.value.config) }
+  val storedConfig by viewModel.config.collectAsStateWithLifecycle()
+  var config by remember(storedConfig) { mutableStateOf(storedConfig) }
 
   Column(
     modifier =
@@ -67,13 +68,7 @@ fun SettingsScreen(
 
     Spacer(Modifier.height(24.dp))
     Button(
-      onClick = {
-        scope.launch {
-          AppGraph.settings.save(config)
-          AppGraph.timer.configure(config)
-          onBack()
-        }
-      },
+      onClick = { viewModel.save(config) { onBack() } },
       modifier = Modifier.fillMaxWidth().height(52.dp),
       colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),
     ) {

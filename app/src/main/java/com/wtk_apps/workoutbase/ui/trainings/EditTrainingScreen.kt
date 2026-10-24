@@ -22,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,15 +31,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.wtk_apps.workoutbase.AppGraph
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wtk_apps.workoutbase.R
-import com.wtk_apps.workoutbase.data.TrainingPreset
 import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.timer.TimerConfig
+import com.wtk_apps.workoutbase.ui.PresetsViewModel
 import com.wtk_apps.workoutbase.ui.settings.TrainingConfigForm
-import kotlinx.coroutines.launch
 
 /** Edits the saved training at [index] (name + parameters) and saves it back. */
 @Composable
@@ -48,9 +46,9 @@ fun EditTrainingScreen(
   index: Int,
   onBack: () -> Unit,
   modifier: Modifier = Modifier,
+  viewModel: PresetsViewModel = viewModel(factory = PresetsViewModel.factory()),
 ) {
-  val scope = rememberCoroutineScope()
-  val presets by AppGraph.settings.presets.collectAsStateWithLifecycle(initialValue = emptyList())
+  val presets by viewModel.presets.collectAsStateWithLifecycle()
 
   var loaded by remember { mutableStateOf(false) }
   var name by remember { mutableStateOf("") }
@@ -100,10 +98,8 @@ fun EditTrainingScreen(
     Button(
       onClick = {
         val finalName = name.trim().ifBlank { preset?.name ?: "Workout" }
-        scope.launch {
-          AppGraph.settings.updatePreset(index, TrainingPreset(finalName, config))
-          onBack()
-        }
+        viewModel.update(index, finalName, config)
+        onBack()
       },
       modifier = Modifier.fillMaxWidth().height(52.dp),
       colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),

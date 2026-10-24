@@ -22,25 +22,25 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
  */
 class SettingsRepository(
   context: Context,
-) {
+) : WorkoutStore {
   private val dataStore = context.applicationContext.dataStore
 
   /** The currently active configuration. */
-  val config: Flow<TimerConfig> = dataStore.data.map { readConfig(it, prefix = "") }
+  override val config: Flow<TimerConfig> = dataStore.data.map { readConfig(it, prefix = "") }
 
   /** Saved trainings, in the order they were added. */
-  val presets: Flow<List<TrainingPreset>> =
+  override val presets: Flow<List<TrainingPreset>> =
     dataStore.data.map { preferences ->
       val count = preferences.presetCount()
       (0 until count).mapNotNull { index -> readPreset(preferences, index) }
     }
 
-  suspend fun save(config: TimerConfig) {
+  override suspend fun save(config: TimerConfig) {
     dataStore.edit { ConfigPreferences.write(it, prefix = "", config = config) }
   }
 
   /** Overwrites the saved training at [index]. */
-  suspend fun updatePreset(
+  override suspend fun updatePreset(
     index: Int,
     preset: TrainingPreset,
   ) {
@@ -52,7 +52,7 @@ class SettingsRepository(
   }
 
   /** Stores [preset] if there is room; returns false when the limit is reached. */
-  suspend fun addPreset(preset: TrainingPreset): Boolean {
+  override suspend fun addPreset(preset: TrainingPreset): Boolean {
     var added = false
     dataStore.edit { preferences ->
       val count = preferences.presetCount()
@@ -65,7 +65,7 @@ class SettingsRepository(
     return added
   }
 
-  suspend fun deletePreset(index: Int) {
+  override suspend fun deletePreset(index: Int) {
     dataStore.edit { preferences ->
       val count = preferences.presetCount()
       if (index !in 0 until count) return@edit

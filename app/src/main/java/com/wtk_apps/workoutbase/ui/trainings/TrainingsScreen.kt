@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,24 +34,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.wtk_apps.workoutbase.AppGraph
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.data.MAX_PRESETS
-import com.wtk_apps.workoutbase.data.TrainingPreset
 import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.theme.WorkRedOrange
-import kotlinx.coroutines.launch
+import com.wtk_apps.workoutbase.ui.PresetsViewModel
 
 @Composable
 fun TrainingsScreen(
   onBack: () -> Unit,
   onEdit: (Int) -> Unit,
   modifier: Modifier = Modifier,
+  viewModel: PresetsViewModel = viewModel(factory = PresetsViewModel.factory()),
 ) {
-  val scope = rememberCoroutineScope()
-  val presets by AppGraph.settings.presets.collectAsStateWithLifecycle(initialValue = emptyList())
+  val presets by viewModel.presets.collectAsStateWithLifecycle()
   var showSaveDialog by remember { mutableStateOf(false) }
   var nameInput by remember { mutableStateOf("") }
   var limitReached by remember { mutableStateOf(false) }
@@ -124,10 +122,7 @@ fun TrainingsScreen(
       confirmButton = {
         TextButton(onClick = {
           val name = nameInput.trim().ifBlank { "Workout ${presets.size + 1}" }
-          scope.launch {
-            val added = AppGraph.settings.addPreset(TrainingPreset(name, AppGraph.timer.state.value.config))
-            limitReached = !added
-          }
+          viewModel.saveCurrent(name) { added -> limitReached = !added }
           showSaveDialog = false
         }) {
           Text(stringResource(R.string.action_save))
@@ -164,10 +159,7 @@ fun TrainingsScreen(
           Spacer(Modifier.height(18.dp))
           DialogAction("LOAD", filled = true, accent = AccentGold, modifier = Modifier.fillMaxWidth()) {
             preset?.let {
-              scope.launch {
-                AppGraph.settings.save(it.config)
-                AppGraph.timer.configure(it.config)
-              }
+              viewModel.apply(it)
               onBack()
             }
             actionsFor = null
@@ -225,7 +217,7 @@ fun TrainingsScreen(
             }
             DialogAction("YES", filled = true, accent = WorkRedOrange, modifier = Modifier.weight(1f)) {
               pendingDelete = null
-              scope.launch { AppGraph.settings.deletePreset(deleteIndex) }
+              viewModel.delete(deleteIndex)
             }
           }
         }

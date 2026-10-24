@@ -6,7 +6,7 @@
     <ID>CyclomaticComplexMethod:TimerEngine.kt$TimerEngine$private fun cuesBetween( state: TimerState, beforeMillis: Long, afterMillis: Long, ): List&lt;TimerCue&gt;</ID>
     <ID>LongMethod:FlameBackground.kt$@Composable private fun ProceduralFlameBackground(color: Color)</ID>
     <ID>LongMethod:TimerScreen.kt$@Composable internal fun SessionProgressBar( config: TimerConfig, remainingMillis: Long, speed: Float, modifier: Modifier = Modifier, )</ID>
-    <ID>LongMethod:TrainingsScreen.kt$@Composable fun TrainingsScreen( onBack: () -&gt; Unit, onEdit: (Int) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:TrainingsScreen.kt$@Composable fun TrainingsScreen( onBack: () -&gt; Unit, onEdit: (Int) -&gt; Unit, modifier: Modifier = Modifier, viewModel: PresetsViewModel = viewModel(factory = PresetsViewModel.factory()), )</ID>
     <ID>LongParameterList:TimerEngineTest.kt$TimerEngineTest$( rounds: Int = 3, workMillis: Long = 10_000L, restMillis: Long = 5_000L, prepareMillis: Long = 0L, halfWayEnabled: Boolean = true, countdownEnabled: Boolean = true, )</ID>
     <ID>MagicNumber:AndroidCuePlayer.kt$AndroidCuePlayer$150L</ID>
     <ID>MagicNumber:Color.kt$0xFF0A0A0B</ID>
@@ -45,7 +45,9 @@
     <ID>MaxLineLength:ConfigFields.kt$FormDialogButton("CANCEL", filled = false, accent = TextSecondary, modifier = Modifier.weight(1f), onClick = onDismiss)</ID>
     <ID>MaxLineLength:EditTrainingScreen.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
     <ID>MaxLineLength:FlameBackground.kt$brush = Brush.verticalGradient(listOf(Color.Transparent, color.copy(alpha = 0.12f)), startY = h * 0.80f, endY = h)</ID>
+    <ID>MaxLineLength:PresetsViewModel.kt$PresetsViewModel.Companion$fun factory(): ViewModelProvider.Factory</ID>
     <ID>MaxLineLength:SettingsScreen.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
+    <ID>MaxLineLength:SettingsViewModel.kt$SettingsViewModel.Companion$fun factory(): ViewModelProvider.Factory</ID>
     <ID>MaxLineLength:TimerComponents.kt$colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary)</ID>
     <ID>MaxLineLength:TimerEngine.kt$TimerEngine$TimerState(config = config, phase = TimerPhase.IDLE, round = 0, remainingMillis = 0L, phaseMillis = 0L, running = false)</ID>
     <ID>MaxLineLength:TimerEngine.kt$TimerEngine$if (state.phase != TimerPhase.PREPARE &amp;&amp; state.phase != TimerPhase.WORK &amp;&amp; state.phase != TimerPhase.REST) return state</ID>
