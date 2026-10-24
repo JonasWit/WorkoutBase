@@ -77,9 +77,13 @@ fun TrainingsScreen(
     }
 
     Spacer(Modifier.height(8.dp))
-    Text(stringResource(R.string.label_saved_count, presets.size, MAX_PRESETS), color = TextSecondary, fontSize = 13.sp)
-
-    BackupSection(presets = presets, viewModel = viewModel)
+    Text(
+      stringResource(R.string.label_saved_count, presets.size, MAX_PRESETS),
+      color = TextSecondary,
+      fontSize = 13.sp,
+      textAlign = TextAlign.Center,
+      modifier = Modifier.fillMaxWidth(),
+    )
 
     Spacer(Modifier.height(16.dp))
     Button(
@@ -98,6 +102,9 @@ fun TrainingsScreen(
       Spacer(Modifier.height(8.dp))
       Text(stringResource(R.string.label_limit_reached, MAX_PRESETS), color = TextSecondary, fontSize = 13.sp)
     }
+
+    Spacer(Modifier.height(10.dp))
+    BackupSection(presets = presets, viewModel = viewModel)
 
     Spacer(Modifier.height(16.dp))
     if (presets.isEmpty()) {

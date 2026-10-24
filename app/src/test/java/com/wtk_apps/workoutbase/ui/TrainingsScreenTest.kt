@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.wtk_apps.workoutbase.data.MAX_PRESETS
 import com.wtk_apps.workoutbase.data.TrainingPreset
 import com.wtk_apps.workoutbase.timer.CuePlayer
 import com.wtk_apps.workoutbase.timer.MonotonicClock
@@ -58,7 +59,7 @@ class TrainingsScreenTest {
 
     compose.onNodeWithText("Trainings").assertIsDisplayed()
     compose.onNodeWithText("Rano").assertIsDisplayed()
-    compose.onNodeWithText("1 / 10 saved").assertIsDisplayed()
+    compose.onNodeWithText("1 / $MAX_PRESETS saved").assertIsDisplayed()
     compose.onNodeWithText("EXPORT").assertIsDisplayed()
     compose.onNodeWithText("IMPORT").assertIsDisplayed()
   }

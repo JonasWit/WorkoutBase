@@ -9,4 +9,4 @@ data class TrainingPreset(
 )
 
 /** Upper bound on how many presets can be stored. */
-const val MAX_PRESETS = 10
+const val MAX_PRESETS = 20

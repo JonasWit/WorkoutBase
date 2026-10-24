@@ -8,11 +8,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -168,22 +170,31 @@ internal fun BackupActions(
 ) {
   Row(
     modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.SpaceBetween,
+    horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    TextButton(onClick = onExport) {
+    TextButton(
+      onClick = onExport,
+      modifier = Modifier.height(32.dp),
+      contentPadding = PaddingValues(horizontal = 10.dp),
+    ) {
       Text(
         stringResource(R.string.action_export),
         color = TextSecondary,
-        fontSize = 13.sp,
+        fontSize = 11.sp,
         letterSpacing = 1.sp,
       )
     }
-    TextButton(onClick = onImport) {
+    Spacer(Modifier.width(8.dp))
+    TextButton(
+      onClick = onImport,
+      modifier = Modifier.height(32.dp),
+      contentPadding = PaddingValues(horizontal = 10.dp),
+    ) {
       Text(
         stringResource(R.string.action_import),
         color = TextSecondary,
-        fontSize = 13.sp,
+        fontSize = 11.sp,
         letterSpacing = 1.sp,
       )
     }
