@@ -1,5 +1,7 @@
 package com.wtk_apps.workoutbase
 
+import com.wtk_apps.workoutbase.AppGraph
+
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -22,7 +24,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wtk_apps.workoutbase.theme.WorkoutBaseTheme
-import com.wtk_apps.workoutbase.timer.TimerController
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
     enableEdgeToEdge()
     setContent {
       WorkoutBaseTheme {
-        val timerState by TimerController.state.collectAsStateWithLifecycle()
+        val timerState by AppGraph.timer.state.collectAsStateWithLifecycle()
         KeepScreenOnWhileRunning(timerState.running)
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           NotificationPermissionRequest()

@@ -1,9 +1,7 @@
 package com.wtk_apps.workoutbase.timer
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,30 +10,32 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
- * App-scoped holder that drives the pure [TimerEngine] using wall-clock time and
- * forwards cues to a [CuePlayer].
+ * Drives the pure [TimerEngine] with elapsed time and forwards cues to a [CuePlayer].
  *
- * Keeping the running loop here (rather than in a ViewModel) means the timer
- * keeps counting while a foreground [com.wtk_apps.workoutbase.service.TimerService]
- * keeps the process alive with the screen off.
+ * Both the clock and the scope are injected, so the whole loop is tested with virtual
+ * time. The controller owns one session at a time; the host is responsible for creating
+ * a single instance and for its lifetime.
  */
-object TimerController {
+class TimerController(
+  private val cuePlayer: CuePlayer,
+  private val clock: MonotonicClock,
+  private val scope: CoroutineScope,
+  private val tickMillis: Long = DEFAULT_TICK_MILLIS,
+) {
 
-  private const val TICK_MILLIS = 100L
-
-  private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
   private val _state = MutableStateFlow(TimerEngine.initialState(TimerConfig()))
 
   /** Observable timer state for the UI and the foreground notification. */
   val state: StateFlow<TimerState> = _state.asStateFlow()
 
-  /** Content observer that should be notified when timer state changes. */
-  var cuePlayer: CuePlayer? = null
+  private var loopJob: Job? = null
+  private var lastTickMillis = 0L
 
   /** Replaces the configuration, resetting the session unless one is running. */
   fun configure(config: TimerConfig) {
     _state.value =
       if (_state.value.running) _state.value.copy(config = config) else TimerEngine.reset(config)
+    syncLoop()
   }
 
   fun toggle() = apply(TimerEngine.toggle(_state.value))
@@ -50,7 +50,7 @@ object TimerController {
   }
 
   private fun apply(transition: TimerTransition) {
-    transition.cues.forEach { cuePlayer?.play(it, _state.value.config) }
+    transition.cues.forEach { cuePlayer.play(it, _state.value.config) }
     _state.value = transition.state
     syncLoop()
   }
@@ -61,19 +61,20 @@ object TimerController {
 
   private fun startLoop() {
     if (loopJob?.isActive == true) return
-    lastTickNanos = System.nanoTime()
-    loopJob = scope.launch {
-      while (isActive) {
-        delay(TICK_MILLIS)
-        val now = System.nanoTime()
-        val deltaMillis = (now - lastTickNanos) / 1_000_000L
-        lastTickNanos = now
-        val transition = TimerEngine.tick(_state.value, deltaMillis)
-        transition.cues.forEach { cuePlayer?.play(it, _state.value.config) }
-        _state.value = transition.state
-        if (!transition.state.running) break
+    lastTickMillis = clock.nowMillis()
+    loopJob =
+      scope.launch {
+        while (isActive) {
+          delay(tickMillis)
+          val now = clock.nowMillis()
+          val deltaMillis = now - lastTickMillis
+          lastTickMillis = now
+          val transition = TimerEngine.tick(_state.value, deltaMillis)
+          transition.cues.forEach { cuePlayer.play(it, _state.value.config) }
+          _state.value = transition.state
+          if (!transition.state.running) break
+        }
       }
-    }
   }
 
   private fun stopLoop() {
@@ -81,6 +82,7 @@ object TimerController {
     loopJob = null
   }
 
-  private var loopJob: Job? = null
-  private var lastTickNanos = 0L
+  companion object {
+    const val DEFAULT_TICK_MILLIS = 100L
+  }
 }

@@ -30,13 +30,12 @@ import com.wtk_apps.workoutbase.AppGraph
 import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
-import com.wtk_apps.workoutbase.timer.TimerController
 import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
   val scope = rememberCoroutineScope()
-  var config by remember { mutableStateOf(TimerController.state.value.config) }
+  var config by remember { mutableStateOf(AppGraph.timer.state.value.config) }
 
   Column(
     modifier = modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp),
@@ -56,7 +55,7 @@ fun SettingsScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
       onClick = {
         scope.launch {
           AppGraph.settings.save(config)
-          TimerController.configure(config)
+          AppGraph.timer.configure(config)
           onBack()
         }
       },

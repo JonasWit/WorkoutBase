@@ -53,7 +53,6 @@ import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.theme.WorkRedOrange
 import com.wtk_apps.workoutbase.theme.WorkYellow
-import com.wtk_apps.workoutbase.timer.TimerController
 import com.wtk_apps.workoutbase.timer.formatMillis
 import com.wtk_apps.workoutbase.timer.totalSessionMillis
 import kotlinx.coroutines.launch
@@ -124,7 +123,7 @@ fun TrainingsScreen(onBack: () -> Unit, onEdit: (Int) -> Unit, modifier: Modifie
         TextButton(onClick = {
           val name = nameInput.trim().ifBlank { "Workout ${presets.size + 1}" }
           scope.launch {
-            val added = AppGraph.settings.addPreset(TrainingPreset(name, TimerController.state.value.config))
+            val added = AppGraph.settings.addPreset(TrainingPreset(name, AppGraph.timer.state.value.config))
             limitReached = !added
           }
           showSaveDialog = false
@@ -161,7 +160,7 @@ fun TrainingsScreen(onBack: () -> Unit, onEdit: (Int) -> Unit, modifier: Modifie
             preset?.let {
               scope.launch {
                 AppGraph.settings.save(it.config)
-                TimerController.configure(it.config)
+                AppGraph.timer.configure(it.config)
               }
               onBack()
             }

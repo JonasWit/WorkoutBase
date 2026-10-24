@@ -1,5 +1,7 @@
 package com.wtk_apps.workoutbase.ui.timer
 
+import com.wtk_apps.workoutbase.AppGraph
+
 import android.graphics.RuntimeShader
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -81,7 +83,6 @@ import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
 import com.wtk_apps.workoutbase.theme.WorkYellow
 import com.wtk_apps.workoutbase.theme.workProgressColor
-import com.wtk_apps.workoutbase.timer.TimerController
 import com.wtk_apps.workoutbase.timer.TimerConfig
 import com.wtk_apps.workoutbase.timer.TimerPhase
 import com.wtk_apps.workoutbase.timer.TimerState
@@ -100,7 +101,7 @@ fun TimerScreen(
   onOpenTrainings: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  val state by TimerController.state.collectAsStateWithLifecycle()
+  val state by AppGraph.timer.state.collectAsStateWithLifecycle()
   val context = LocalContext.current
 
   // Keep the timer alive with a foreground service while it is running.
@@ -430,7 +431,7 @@ private fun Controls(state: TimerState) {
     verticalAlignment = Alignment.CenterVertically,
   ) {
     OutlinedButton(
-      onClick = { TimerController.reset() },
+      onClick = { AppGraph.timer.reset() },
       modifier = Modifier.width(92.dp),
       contentPadding = PaddingValues(horizontal = 8.dp),
     ) {
@@ -444,7 +445,7 @@ private fun Controls(state: TimerState) {
         else -> "RESUME"
       }
     Button(
-      onClick = { TimerController.toggle() },
+      onClick = { AppGraph.timer.toggle() },
       modifier = Modifier.weight(1f).height(56.dp),
       contentPadding = PaddingValues(horizontal = 8.dp),
       colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),
@@ -459,7 +460,7 @@ private fun Controls(state: TimerState) {
       )
     }
     OutlinedButton(
-      onClick = { TimerController.skip() },
+      onClick = { AppGraph.timer.skip() },
       modifier = Modifier.width(92.dp),
       contentPadding = PaddingValues(horizontal = 8.dp),
     ) {

@@ -1,5 +1,7 @@
 package com.wtk_apps.workoutbase.service
 
+import com.wtk_apps.workoutbase.AppGraph
+
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -16,7 +18,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.wtk_apps.workoutbase.MainActivity
 import com.wtk_apps.workoutbase.R
-import com.wtk_apps.workoutbase.timer.TimerController
 import com.wtk_apps.workoutbase.timer.TimerPhase
 import com.wtk_apps.workoutbase.timer.TimerState
 import com.wtk_apps.workoutbase.timer.formatMillis
@@ -47,7 +48,7 @@ class TimerService : Service() {
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-    val notification = buildNotification(TimerController.state.value)
+    val notification = buildNotification(AppGraph.timer.state.value)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
     } else {
@@ -56,7 +57,7 @@ class TimerService : Service() {
     acquireWakeLock()
     if (collectJob == null) {
       collectJob = scope.launch {
-        TimerController.state.collectLatest { updateNotification(it) }
+        AppGraph.timer.state.collectLatest { updateNotification(it) }
       }
     }
     return START_NOT_STICKY
