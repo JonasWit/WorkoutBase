@@ -13,6 +13,7 @@ Read it before writing code. This file only records what is specific to this pro
   proves nothing.
 - No claim without a test; otherwise say "unverified" and what is missing.
 - Commands:
+  - fast loop while iterating: `./gradlew fastTest --offline` (unit tests only)
   - unit tests: `./gradlew :app:testDebugUnitTest`
   - full check (lint + unit tests): `./gradlew check`
 - Every commit message needs a trailer line: `Test: <name>` or

@@ -51,6 +51,13 @@ detekt {
   baseline = file("detekt-baseline.xml")
 }
 
+// Fast loop: unit tests only. Lint, detekt and ktlint run on check before a commit.
+tasks.register("fastTest") {
+  group = "verification"
+  description = "Runs unit tests only, without static analysis."
+  dependsOn("testDebugUnitTest")
+}
+
 tasks.named("check") {
   dependsOn("ktlintCheck", "detekt")
 }
@@ -90,6 +97,7 @@ dependencies {
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.androidx.test.espresso.core)
+  androidTestImplementation(libs.uiautomator)
 
   // Navigation
   implementation(libs.androidx.navigation3.ui)

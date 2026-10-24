@@ -2,12 +2,15 @@ package com.wtk_apps.workoutbase
 
 import android.Manifest
 import android.os.ParcelFileDescriptor
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
+import org.junit.After
+import org.junit.Assert.assertNotNull
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
@@ -16,43 +19,53 @@ import org.junit.runner.RunWith
 import org.junit.runners.model.Statement
 
 /**
- * End-to-end smoke checks on a real device: the app starts, the timer screen renders its
- * text, and navigation reaches the settings and trainings screens.
+ * End-to-end smoke checks on a device: the app starts, the timer screen renders its text,
+ * and navigation reaches the settings and trainings screens.
  *
- * The notification permission is granted through a shell command instead of
- * GrantPermissionRule, because MIUI rejects UiAutomation grants; without it the system
- * dialog covers the UI under test.
+ * Assertions use UiAutomator rather than Compose finders because the flame animation never
+ * goes idle, which makes every Compose finder time out. The notification permission is
+ * granted through a shell command because MIUI rejects UiAutomator grants.
  */
 @RunWith(AndroidJUnit4::class)
 class AppSmokeTest {
-  @get:Rule(order = 0)
-  val notificationPermission: TestRule = ShellGrantRule(Manifest.permission.POST_NOTIFICATIONS)
+  @get:Rule val notificationPermission: TestRule = ShellGrantRule(Manifest.permission.POST_NOTIFICATIONS)
 
-  @get:Rule(order = 1)
-  val compose = createAndroidComposeRule<MainActivity>()
+  private lateinit var scenario: ActivityScenario<MainActivity>
+  private val device: UiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+
+  @Before
+  fun setUp() {
+    scenario = ActivityScenario.launch(MainActivity::class.java)
+    assertNotNull("timer screen did not appear", device.wait(Until.hasObject(By.text("WORKOUT BASE")), 10_000))
+  }
+
+  @After
+  fun tearDown() {
+    scenario.close()
+  }
 
   @Test
   fun timerScreen_showsTitleAndNavigation() {
-    compose.onNodeWithText("WORKOUT BASE").assertIsDisplayed()
-    compose.onNodeWithText("Trainings").assertIsDisplayed()
-    compose.onNodeWithText("Settings").assertIsDisplayed()
+    assertNotNull(device.findObject(By.text("Trainings")))
+    assertNotNull(device.findObject(By.text("Settings")))
   }
 
   @Test
   fun timerStartsInReadyPhase() {
-    compose.onNodeWithText("READY").assertIsDisplayed()
+    assertNotNull(device.findObject(By.text("READY")))
   }
 
   @Test
   fun settingsLink_opensTheSettingsScreen() {
-    compose.onNodeWithText("Settings").performClick()
-    compose.onNodeWithText("SAVE").assertIsDisplayed()
+    device.findObject(By.text("Settings")).click()
+    assertNotNull(device.wait(Until.hasObject(By.text("SAVE")), 5_000))
   }
 
   @Test
   fun trainingsLink_opensTheTrainingsScreen() {
-    compose.onNodeWithText("Trainings").performClick()
-    compose.onNodeWithText("SAVE CURRENT WORKOUT").assertIsDisplayed()
+    device.findObject(By.text("Trainings")).click()
+    assertNotNull(device.wait(Until.hasObject(By.text("SAVE CURRENT WORKOUT")), 5_000))
+    assertNotNull("backup actions missing", device.findObject(By.text("EXPORT")))
   }
 }
 

@@ -5,19 +5,22 @@ sygnały dźwiękowe i wibracyjne, presety treningów oraz timer działający pr
 
 Kotlin, Jetpack Compose, jeden moduł `app`.
 
-## Komendy
+## Pętla pracy
 
-Testy jednostkowe:
-
-```sh
-./gradlew :app:testDebugUnitTest
-```
-
-Pełne sprawdzenie (lint Androida + testy jednostkowe):
+Szybka pętla podczas pisania kodu — tylko testy jednostkowe, bez statycznej analizy (kilkanaście sekund):
 
 ```sh
-./gradlew check
+./gradlew fastTest --offline
 ```
+
+Pełne sprawdzenie przed commitem — ktlint, detekt, Android Lint i testy:
+
+```sh
+./gradlew check --offline
+```
+Emulator uruchamiaj tylko wtedy, gdy trzeba zobaczyć UI; nie uruchamiaj testów instrumentalnych na telefonie z danymi użytkownika.
+
+## Hook
 
 Hook blokujący commity bez dowodu — włącz raz na klon:
 
