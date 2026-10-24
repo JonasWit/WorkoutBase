@@ -20,6 +20,9 @@ import kotlinx.coroutines.launch
  *
  * Sounds are played on the media stream (which users normally keep audible)
  * rather than the alarm stream, so cues are reliably heard during training.
+ *
+ * The sequence for each cue comes from [cuePlan]; this class only turns steps into
+ * Android calls, which keeps the behaviour testable off-device.
  */
 class AndroidCuePlayer(context: Context) : CuePlayer {
 
@@ -51,48 +54,43 @@ class AndroidCuePlayer(context: Context) : CuePlayer {
   }
 
   override fun play(cue: TimerCue, config: TimerConfig) {
-    when (cue) {
-      TimerCue.PREPARE_START -> {
-        sound(beepId, config)
-        vibrate(120L, config)
-      }
-      TimerCue.WORK_START -> {
-        sound(gongId, config)
-        vibrate(400L, config)
-      }
-      TimerCue.WORK_END -> {
-        sound(gongId, config)
-        vibrate(400L, config)
-      }
-      TimerCue.HALF_WAY -> {
-        sound(beepId, config)
-        vibrate(120L, config)
-      }
-      TimerCue.COUNTDOWN -> {
-        sound(beepId, config)
-        vibrate(80L, config)
-      }
-      TimerCue.FINISHED -> {
-        vibrate(700L, config)
-        scope.launch {
-          repeat(3) { index ->
-            sound(gongId, config)
-            if (index < 2) delay(700L)
-          }
-        }
+    val plan = cuePlan(cue)
+    val firstWait = plan.indexOfFirst { it is CueStep.Wait }
+
+    if (firstWait < 0) {
+      plan.forEach { execute(it, config) }
+      return
+    }
+
+    // Execute everything before the first pause immediately, so the reaction starts
+    // with the cue, then continue the rest on a coroutine.
+    plan.take(firstWait).forEach { execute(it, config) }
+    scope.launch {
+      for (index in firstWait until plan.size) {
+        val step = plan[index]
+        if (step is CueStep.Wait) delay(step.millis) else execute(step, config)
       }
     }
   }
 
-  private fun sound(soundId: Int, config: TimerConfig) {
+  private fun execute(step: CueStep, config: TimerConfig) {
+    when (step) {
+      is CueStep.Sound -> sound(step.sound, config)
+      is CueStep.Vibrate -> vibrate(step.millis, config)
+      is CueStep.Wait -> Unit
+    }
+  }
+
+  private fun sound(kind: CueSound, config: TimerConfig) {
     if (!config.soundEnabled) return
+    val id = if (kind == CueSound.BEEP) beepId else gongId
     if (loaded) {
-      runCatching { soundPool.play(soundId, VOLUME, VOLUME, 1, 0, 1f) }
+      runCatching { soundPool.play(id, VOLUME, VOLUME, 1, 0, 1f) }
     } else {
       // The very first cue may arrive before SoundPool finished loading; retry once.
       scope.launch {
         delay(150L)
-        if (loaded) runCatching { soundPool.play(soundId, VOLUME, VOLUME, 1, 0, 1f) }
+        if (loaded) runCatching { soundPool.play(id, VOLUME, VOLUME, 1, 0, 1f) }
       }
     }
   }
