@@ -55,3 +55,6 @@ tests; configuration mapping lives in `ConfigPreferences`; duration conversion l
   same diff.
 - New dependency needs a justification: what the standard library or Compose cannot do.
 - Do not guess Android APIs. Check the version in `gradle/libs.versions.toml` first.
+- Never run instrumented tests against a phone that holds real user data:
+  `connectedDebugAndroidTest` uninstalls the app and wipes its DataStore. Use the
+  emulator.
