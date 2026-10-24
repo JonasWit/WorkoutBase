@@ -97,6 +97,10 @@ class AndroidCuePlayer(
     }
   }
 
+  /**
+   * Playback failures are swallowed on purpose: a broken audio route must never interrupt
+   * or crash an ongoing workout, and there is no recovery worth surfacing to the user.
+   */
   private fun sound(
     kind: CueSound,
     config: TimerConfig,

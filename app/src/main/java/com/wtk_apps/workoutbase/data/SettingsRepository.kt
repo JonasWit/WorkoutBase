@@ -82,7 +82,7 @@ class SettingsRepository(
   private fun readConfig(
     preferences: Preferences,
     prefix: String,
-  ): TimerConfig = runCatching { ConfigPreferences.read(preferences, prefix) }.getOrDefault(TimerConfig())
+  ): TimerConfig = ConfigPreferences.read(preferences, prefix)
 
   private fun readPreset(
     preferences: Preferences,

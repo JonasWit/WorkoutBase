@@ -48,4 +48,4 @@ docelowej architektury — nie naprawiaj ich przy okazji innych zmian.
 
 ## Licencja
 
-Projekt prywatny, wszystkie prawa zastrzeżone.
+MIT — szczegóły w pliku [`LICENSE`](LICENSE).
