@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.Outline1
 import com.wtk_apps.workoutbase.theme.Surface2
@@ -66,15 +68,15 @@ internal fun TrainingConfigForm(
   modifier: Modifier = Modifier,
 ) {
   Column(modifier = modifier.fillMaxWidth()) {
-    SectionTitle("Session")
+    SectionTitle(stringResource(R.string.section_session))
 
-    SingleNumberField("Rounds", config.rounds, 1..99) {
+    SingleNumberField(stringResource(R.string.field_rounds), config.rounds, 1..99) {
       onConfigChange(config.copy(rounds = it))
     }
 
     val work = durationParts(config.workMillis)
     DurationFields(
-      label = "Work",
+      label = stringResource(R.string.field_work),
       parts = work,
       minimumMillis = 1_000L,
       onChange = { onConfigChange(config.copy(workMillis = it)) },
@@ -82,7 +84,7 @@ internal fun TrainingConfigForm(
 
     val rest = durationParts(config.restMillis)
     DurationFields(
-      label = "Rest",
+      label = stringResource(R.string.field_rest),
       parts = rest,
       minimumMillis = 0L,
       onChange = { onConfigChange(config.copy(restMillis = it)) },
@@ -90,21 +92,29 @@ internal fun TrainingConfigForm(
 
     val prepare = durationParts(config.prepareMillis)
     DurationFields(
-      label = "Prepare",
+      label = stringResource(R.string.field_prepare),
       parts = prepare,
       minimumMillis = 0L,
       onChange = { onConfigChange(config.copy(prepareMillis = it)) },
     )
 
     Spacer(Modifier.height(16.dp))
-    SectionTitle("Cues")
-    SingleNumberField("Countdown (s)", config.countdownSeconds, 0..10) {
+    SectionTitle(stringResource(R.string.section_cues))
+    SingleNumberField(stringResource(R.string.field_countdown), config.countdownSeconds, 0..10) {
       onConfigChange(config.copy(countdownSeconds = it))
     }
-    Toggle("Half-way cue", config.halfWayEnabled) { onConfigChange(config.copy(halfWayEnabled = it)) }
-    Toggle("Countdown cue", config.countdownEnabled) { onConfigChange(config.copy(countdownEnabled = it)) }
-    Toggle("Sound", config.soundEnabled) { onConfigChange(config.copy(soundEnabled = it)) }
-    Toggle("Vibration", config.vibrationEnabled) { onConfigChange(config.copy(vibrationEnabled = it)) }
+    Toggle(stringResource(R.string.toggle_half_way), config.halfWayEnabled) {
+      onConfigChange(config.copy(halfWayEnabled = it))
+    }
+    Toggle(stringResource(R.string.toggle_countdown), config.countdownEnabled) {
+      onConfigChange(config.copy(countdownEnabled = it))
+    }
+    Toggle(stringResource(R.string.toggle_sound), config.soundEnabled) {
+      onConfigChange(config.copy(soundEnabled = it))
+    }
+    Toggle(stringResource(R.string.toggle_vibration), config.vibrationEnabled) {
+      onConfigChange(config.copy(vibrationEnabled = it))
+    }
   }
 }
 
@@ -196,7 +206,7 @@ private fun TimeField(
 
   if (editMinutes) {
     NumberInputDialog(
-      title = "$label — minutes",
+      title = stringResource(R.string.dialog_minutes, label),
       value = minutes,
       range = 0..99,
       onConfirm = {
@@ -208,7 +218,7 @@ private fun TimeField(
   }
   if (editSeconds) {
     NumberInputDialog(
-      title = "$label — seconds",
+      title = stringResource(R.string.dialog_seconds, label),
       value = seconds,
       range = 0..59,
       onConfirm = {

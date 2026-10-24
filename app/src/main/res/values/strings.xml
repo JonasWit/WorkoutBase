@@ -1,3 +1,57 @@
 <resources>
-    <string name="app_name">WorkoutBase</string>
+  <string name="app_name">WorkoutBase</string>
+
+  <string name="title_workout_base">WORKOUT BASE</string>
+  <string name="title_settings">Settings</string>
+  <string name="title_trainings">Trainings</string>
+  <string name="title_edit_training">Edit training</string>
+
+  <string name="action_back">Back</string>
+  <string name="action_save">Save</string>
+  <string name="action_save_upper">SAVE</string>
+  <string name="action_save_changes">SAVE CHANGES</string>
+  <string name="action_save_current_workout">SAVE CURRENT WORKOUT</string>
+  <string name="action_cancel">Cancel</string>
+  <string name="action_reset">Reset</string>
+  <string name="action_skip">Skip</string>
+
+  <string name="label_name">Name</string>
+  <string name="label_rounds">ROUNDS</string>
+  <string name="label_work">WORK</string>
+  <string name="label_rest">REST</string>
+  <string name="label_total">TOTAL</string>
+  <string name="label_round_progress">ROUND %1$d / %2$d</string>
+  <string name="label_saved_count">%1$d / %2$d saved</string>
+  <string name="label_limit_reached">Limit of %1$d trainings reached. Delete one first.</string>
+  <string name="label_no_trainings">No saved trainings yet. Configure the timer, then save it here.</string>
+
+  <string name="dialog_save_training">Save training</string>
+  <string name="dialog_delete_training">Delete training?</string>
+
+  <string name="section_session">Session</string>
+  <string name="section_cues">Cues</string>
+
+  <string name="field_rounds">Rounds</string>
+  <string name="field_countdown">Countdown (s)</string>
+  <string name="field_work">Work</string>
+  <string name="field_rest">Rest</string>
+  <string name="field_prepare">Prepare</string>
+
+  <string name="toggle_half_way">Half-way cue</string>
+  <string name="toggle_countdown">Countdown cue</string>
+  <string name="toggle_sound">Sound</string>
+  <string name="toggle_vibration">Vibration</string>
+
+  <string name="dialog_minutes">%1$s – minutes</string>
+  <string name="dialog_seconds">%1$s – seconds</string>
+
+  <string name="phase_idle">READY</string>
+  <string name="phase_prepare">GET READY</string>
+  <string name="phase_work">WORK</string>
+  <string name="phase_rest">REST</string>
+  <string name="phase_finished">DONE</string>
+
+  <string name="notification_channel_name">Training timer</string>
+  <string name="notification_channel_description">Shows the running training timer</string>
+  <string name="notification_round">Round %1$d/%2$d</string>
 </resources>

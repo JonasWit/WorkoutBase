@@ -23,10 +23,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wtk_apps.workoutbase.AppGraph
+import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.TextPrimary
 import com.wtk_apps.workoutbase.theme.TextSecondary
@@ -49,9 +51,14 @@ fun SettingsScreen(
         .padding(24.dp),
   ) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-      Text("Settings", color = TextPrimary, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+      Text(
+        stringResource(R.string.title_settings),
+        color = TextPrimary,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = 1.sp,
+      )
       Spacer(Modifier.weight(1f))
-      TextButton(onClick = onBack) { Text("Back", color = TextSecondary) }
+      TextButton(onClick = onBack) { Text(stringResource(R.string.action_back), color = TextSecondary) }
     }
 
     Spacer(Modifier.height(16.dp))
@@ -70,7 +77,7 @@ fun SettingsScreen(
       modifier = Modifier.fillMaxWidth().height(52.dp),
       colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),
     ) {
-      Text("SAVE", fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+      Text(stringResource(R.string.action_save_upper), fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
     }
   }
 }

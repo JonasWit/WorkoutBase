@@ -62,6 +62,7 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -84,9 +85,9 @@ import com.wtk_apps.workoutbase.timer.TimerConfig
 import com.wtk_apps.workoutbase.timer.TimerPhase
 import com.wtk_apps.workoutbase.timer.TimerState
 import com.wtk_apps.workoutbase.timer.formatMillis
-import com.wtk_apps.workoutbase.timer.label
 import com.wtk_apps.workoutbase.timer.sessionSegments
 import com.wtk_apps.workoutbase.timer.totalRemainingMillis
+import com.wtk_apps.workoutbase.ui.labelRes
 
 /** Roman-inscription style typeface used for the app title. */
 private val RomanTitleFont = FontFamily(Font(R.font.cinzel))
@@ -131,7 +132,7 @@ fun TimerScreen(
     ) {
       // Roman title, single line.
       Text(
-        text = "WORKOUT BASE",
+        text = stringResource(R.string.title_workout_base),
         color = AccentGold,
         fontFamily = RomanTitleFont,
         fontSize = 22.sp,
@@ -160,8 +161,8 @@ fun TimerScreen(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
       ) {
-        BottomLink("Trainings", onOpenTrainings)
-        BottomLink("Settings", onOpenSettings)
+        BottomLink(stringResource(R.string.title_trainings), onOpenTrainings)
+        BottomLink(stringResource(R.string.title_settings), onOpenSettings)
       }
       Spacer(Modifier.height(4.dp))
     }
@@ -193,7 +194,7 @@ private fun PhaseHeader(
   speed: Float,
 ) {
   Text(
-    text = state.phase.label(),
+    text = stringResource(state.phase.labelRes()),
     color = color,
     fontSize = 20.sp,
     fontWeight = FontWeight.Medium,
@@ -204,9 +205,23 @@ private fun PhaseHeader(
     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
     horizontalArrangement = Arrangement.spacedBy(6.dp),
   ) {
-    ParamChip("ROUNDS", state.config.rounds.toString(), AccentGold, Modifier.weight(1f))
-    ParamChip("WORK", formatMillis(state.config.workMillis), WorkYellow, Modifier.weight(1f), active = state.phase == TimerPhase.WORK)
-    ParamChip("REST", formatMillis(state.config.restMillis), RestGreen, Modifier.weight(1f), active = state.phase == TimerPhase.REST)
+    ParamChip(stringResource(R.string.label_rounds), state.config.rounds.toString(), AccentGold, Modifier.weight(1f))
+    ParamChip(
+      stringResource(R.string.label_work),
+      formatMillis(state.config.workMillis),
+      WorkYellow,
+      Modifier.weight(1f),
+      active =
+        state.phase == TimerPhase.WORK,
+    )
+    ParamChip(
+      stringResource(R.string.label_rest),
+      formatMillis(state.config.restMillis),
+      RestGreen,
+      Modifier.weight(1f),
+      active =
+        state.phase == TimerPhase.REST,
+    )
     ParamChip(
       "PREP",
       formatMillis(state.config.prepareMillis),
@@ -218,7 +233,7 @@ private fun PhaseHeader(
   if (state.round > 0) {
     Spacer(Modifier.height(10.dp))
     Text(
-      text = "ROUND ${state.round} / ${state.config.rounds}",
+      text = stringResource(R.string.label_round_progress, state.round, state.config.rounds),
       color = Color.White,
       fontSize = 15.sp,
       fontWeight = FontWeight.Bold,
@@ -458,7 +473,7 @@ private fun Controls(state: TimerState) {
       modifier = Modifier.width(92.dp),
       contentPadding = PaddingValues(horizontal = 8.dp),
     ) {
-      Text("Reset", maxLines = 1, softWrap = false)
+      Text(stringResource(R.string.action_reset), maxLines = 1, softWrap = false)
     }
     val primaryLabel =
       when {
@@ -487,7 +502,7 @@ private fun Controls(state: TimerState) {
       modifier = Modifier.width(92.dp),
       contentPadding = PaddingValues(horizontal = 8.dp),
     ) {
-      Text("Skip", maxLines = 1, softWrap = false)
+      Text(stringResource(R.string.action_skip), maxLines = 1, softWrap = false)
     }
   }
 }

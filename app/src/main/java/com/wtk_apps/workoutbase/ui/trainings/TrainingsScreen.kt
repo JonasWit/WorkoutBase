@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wtk_apps.workoutbase.AppGraph
+import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.data.MAX_PRESETS
 import com.wtk_apps.workoutbase.data.TrainingPreset
 import com.wtk_apps.workoutbase.theme.AccentGold
@@ -80,13 +82,18 @@ fun TrainingsScreen(
         .padding(24.dp),
   ) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-      Text("Trainings", color = TextPrimary, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+      Text(
+        stringResource(R.string.title_trainings),
+        color = TextPrimary,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = 1.sp,
+      )
       Spacer(Modifier.weight(1f))
-      TextButton(onClick = onBack) { Text("Back", color = TextSecondary) }
+      TextButton(onClick = onBack) { Text(stringResource(R.string.action_back), color = TextSecondary) }
     }
 
     Spacer(Modifier.height(8.dp))
-    Text("${presets.size} / $MAX_PRESETS saved", color = TextSecondary, fontSize = 13.sp)
+    Text(stringResource(R.string.label_saved_count, presets.size, MAX_PRESETS), color = TextSecondary, fontSize = 13.sp)
 
     Spacer(Modifier.height(16.dp))
     Button(
@@ -98,17 +105,17 @@ fun TrainingsScreen(
       modifier = Modifier.fillMaxWidth().height(52.dp),
       colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),
     ) {
-      Text("SAVE CURRENT WORKOUT", fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+      Text(stringResource(R.string.action_save_current_workout), fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
     }
 
     if (limitReached) {
       Spacer(Modifier.height(8.dp))
-      Text("Limit of $MAX_PRESETS trainings reached. Delete one first.", color = TextSecondary, fontSize = 13.sp)
+      Text(stringResource(R.string.label_limit_reached, MAX_PRESETS), color = TextSecondary, fontSize = 13.sp)
     }
 
     Spacer(Modifier.height(16.dp))
     if (presets.isEmpty()) {
-      Text("No saved trainings yet. Configure the timer, then save it here.", color = TextSecondary)
+      Text(stringResource(R.string.label_no_trainings), color = TextSecondary)
     }
     presets.forEachIndexed { index, preset ->
       PresetRow(preset = preset, onClick = { actionsFor = index })
@@ -119,13 +126,13 @@ fun TrainingsScreen(
   if (showSaveDialog) {
     AlertDialog(
       onDismissRequest = { showSaveDialog = false },
-      title = { Text("Save training") },
+      title = { Text(stringResource(R.string.dialog_save_training)) },
       text = {
         OutlinedTextField(
           value = nameInput,
           onValueChange = { nameInput = it },
           singleLine = true,
-          label = { Text("Name") },
+          label = { Text(stringResource(R.string.label_name)) },
         )
       },
       confirmButton = {
@@ -137,10 +144,14 @@ fun TrainingsScreen(
           }
           showSaveDialog = false
         }) {
-          Text("Save")
+          Text(stringResource(R.string.action_save))
         }
       },
-      dismissButton = { TextButton(onClick = { showSaveDialog = false }) { Text("Cancel") } },
+      dismissButton = {
+        TextButton(onClick = { showSaveDialog = false }) {
+          Text(stringResource(R.string.action_cancel))
+        }
+      },
     )
   }
 
@@ -186,7 +197,9 @@ fun TrainingsScreen(
             pendingDelete = actionIndex
           }
           Spacer(Modifier.height(4.dp))
-          TextButton(onClick = { actionsFor = null }) { Text("Cancel", color = TextSecondary) }
+          TextButton(onClick = { actionsFor = null }) {
+            Text(stringResource(R.string.action_cancel), color = TextSecondary)
+          }
         }
       }
     }
@@ -206,7 +219,7 @@ fun TrainingsScreen(
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           Text(
-            text = "Delete training?",
+            text = stringResource(R.string.dialog_delete_training),
             color = TextPrimary,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -282,7 +295,13 @@ private fun PresetRow(
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
       Text(preset.name, color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, modifier = Modifier.weight(1f))
       Column(horizontalAlignment = Alignment.End) {
-        Text("TOTAL", color = TextSecondary, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
+        Text(
+          stringResource(R.string.label_total),
+          color = TextSecondary,
+          fontSize = 8.sp,
+          fontWeight = FontWeight.Medium,
+          letterSpacing = 1.sp,
+        )
         Text(
           formatMillis(totalSessionMillis(config)),
           color = AccentGold,

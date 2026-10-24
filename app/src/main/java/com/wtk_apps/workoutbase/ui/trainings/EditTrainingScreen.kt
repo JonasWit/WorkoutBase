@@ -26,12 +26,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wtk_apps.workoutbase.AppGraph
+import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.data.TrainingPreset
 import com.wtk_apps.workoutbase.theme.AccentGold
 import com.wtk_apps.workoutbase.theme.TextPrimary
@@ -76,20 +78,20 @@ fun EditTrainingScreen(
         .padding(24.dp),
   ) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-      Text("Edit training", color = TextPrimary, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+      Text(
+        stringResource(R.string.title_edit_training),
+        color = TextPrimary,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = 1.sp,
+      )
       Spacer(Modifier.weight(1f))
-      TextButton(onClick = onBack) { Text("Back", color = TextSecondary) }
+      TextButton(onClick = onBack) {
+        Text(stringResource(R.string.action_back), color = TextSecondary)
+      }
     }
 
     Spacer(Modifier.height(16.dp))
-    OutlinedTextField(
-      value = name,
-      onValueChange = { name = it },
-      singleLine = true,
-      label = { Text("Name") },
-      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-      modifier = Modifier.fillMaxWidth(),
-    )
+    NameField(name = name, onNameChange = { name = it })
 
     Spacer(Modifier.height(16.dp))
     TrainingConfigForm(config = config, onConfigChange = { config = it })
@@ -106,7 +108,22 @@ fun EditTrainingScreen(
       modifier = Modifier.fillMaxWidth().height(52.dp),
       colors = ButtonDefaults.buttonColors(containerColor = AccentGold, contentColor = MaterialTheme.colorScheme.onPrimary),
     ) {
-      Text("SAVE CHANGES", fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+      Text(stringResource(R.string.action_save_changes), fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
     }
   }
+}
+
+@Composable
+private fun NameField(
+  name: String,
+  onNameChange: (String) -> Unit,
+) {
+  OutlinedTextField(
+    value = name,
+    onValueChange = onNameChange,
+    singleLine = true,
+    label = { Text(stringResource(R.string.label_name)) },
+    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+    modifier = Modifier.fillMaxWidth(),
+  )
 }

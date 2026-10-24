@@ -19,7 +19,7 @@ import com.wtk_apps.workoutbase.MainActivity
 import com.wtk_apps.workoutbase.R
 import com.wtk_apps.workoutbase.timer.TimerState
 import com.wtk_apps.workoutbase.timer.formatMillis
-import com.wtk_apps.workoutbase.timer.label
+import com.wtk_apps.workoutbase.ui.labelRes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -79,7 +79,7 @@ class TimerService : Service() {
 
   private fun buildNotification(state: TimerState): Notification {
     val round = if (state.round > 0) "  •  Round ${state.round}/${state.config.rounds}" else ""
-    val text = "${state.phase.label()}$round"
+    val text = "${getString(state.phase.labelRes())}$round"
     val title = formatMillis(state.remainingMillis)
 
     val contentIntent =
@@ -107,8 +107,12 @@ class TimerService : Service() {
     val manager = getSystemService(NotificationManager::class.java) ?: return
     if (manager.getNotificationChannel(CHANNEL_ID) != null) return
     val channel =
-      NotificationChannel(CHANNEL_ID, "Training timer", NotificationManager.IMPORTANCE_LOW).apply {
-        description = "Shows the running training timer"
+      NotificationChannel(
+        CHANNEL_ID,
+        getString(R.string.notification_channel_name),
+        NotificationManager.IMPORTANCE_LOW,
+      ).apply {
+        description = getString(R.string.notification_channel_description)
         setShowBadge(false)
       }
     manager.createNotificationChannel(channel)

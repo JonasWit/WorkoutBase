@@ -62,12 +62,4 @@ fun totalRemainingMillis(state: TimerState): Long {
   }
 }
 
-/** Human readable label for a phase (English UI). */
-fun TimerPhase.label(): String =
-  when (this) {
-    TimerPhase.IDLE -> "READY"
-    TimerPhase.PREPARE -> "GET READY"
-    TimerPhase.WORK -> "WORK"
-    TimerPhase.REST -> "REST"
-    TimerPhase.FINISHED -> "DONE"
-  }
+/** Total duration of a full session: prepare + rounds*work + (rounds-1)*rest. */
