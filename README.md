@@ -1,64 +1,65 @@
 # WorkoutBase
 
-Interwałowy timer treningowy na Androida: przygotowanie, rundy pracy i przerwy, sygnały
-dźwiękowe i wibracyjne, zapisane treningi oraz praca przy zgaszonym ekranie.
+An interval training timer for Android: prepare, work and rest rounds, sound and
+vibration cues, saved workouts and screen-off operation.
 
-## Funkcje
+## Features
 
-**Timer interwałowy**
+**Interval timer**
 
-- fazy: przygotowanie, praca, przerwa i zakończenie, z automatycznym przejściem do kolejnej rundy
-- konfiguracja liczby rund oraz długości pracy, przerwy i przygotowania
-- odliczanie 3-2-1 przed każdą rundą, z możliwością wyłączenia
-- sygnał w połowie rundy pracy, z możliwością wyłączenia
-- start, pauza, wznowienie, reset i pomijanie fazy
-- szybkie wydłużanie i skracanie bieżącej fazy o 15 sekund
+- phases: prepare, work, rest and finish, with automatic transition to the next round
+- configurable number of rounds and work, rest and prepare durations
+- 3-2-1 countdown before each round, can be turned off
+- half-way cue during the work round, can be turned off
+- start, pause, resume, reset and skip phase
+- quick 15-second extension and shortening of the current phase
 
-**Podczas treningu**
+**During a workout**
 
-- duże odliczanie czytelne z kilku metrów
-- pierścień postępu bieżącej fazy
-- segmentowy pasek całej sesji z podziałem na przygotowanie, pracę i przerwy
-- animowane tło płomieni, którego kolor i tempo zależą od fazy
-- dźwięki i wibracje dla startu pracy, końca rundy, połowy i zakończenia treningu
-- ekran nie gaśnie w trakcie sesji
-- timer działa dalej przy zgaszonym ekranie, z powiadomieniem pokazującym pozostały czas
+- large countdown readable from several meters away
+- progress ring for the current phase
+- segmented bar for the whole session, split into prepare, work and rest
+- animated flame background whose color and speed follow the phase
+- sounds and vibration for work start, round end, half-way and workout end
+- the screen stays on during a session
+- the timer keeps running with the screen off, with a notification showing the remaining time
 
-**Zapisane treningi**
+**Saved workouts**
 
-- zapisanie bieżącej konfiguracji jako trening z nazwą
-- do 20 zapisanych treningów
-- podgląd parametrów, wczytanie, edycja i usuwanie
-- eksport wszystkich treningów do pliku JSON i import z pliku
-- import pokazuje, ile treningów dodano, a ile pominięto z powodu limitu
+- save the current configuration as a named workout
+- up to 20 saved workouts
+- preview parameters, load, edit and delete
+- export all workouts to a JSON file and import from a file
+- import reports how many workouts were added and how many were skipped because of the limit
 
-**Interfejs**
+**Interface**
 
-- cztery ekrany: timer, ustawienia, lista treningów i edycja treningu
-- wszystkie teksty po polsku i angielsku w kodzie źródłowym zasobów
-- numer wersji widoczny pod tytułem na ekranie głównym
+- four screens: timer, settings, workout list and workout editor
+- all text available in Polish and English in the source string resources
+- version number shown under the title on the main screen
 
-## Instalacja
+## Installation
 
-Pobierz plik `app-release.apk` z zakładki
-[Releases](https://github.com/JonasWit/workoutbase/releases) i otwórz go na telefonie.
-Android może poprosić o zgodę na instalację z nieznanego źródła.
+Download `app-release.apk` from the
+[Releases](https://github.com/JonasWit/workoutbase/releases) tab and open it on your
+phone. Android may ask for permission to install from an unknown source.
 
-Jeśli masz zainstalowaną starszą wersję podpisaną innym kluczem, system odmówi aktualizacji.
-Wtedy: `Trainings` → `EXPORT`, odinstalowanie starej wersji, instalacja nowej, `IMPORT`.
+If you have an older version signed with a different key, the system will refuse the
+update. In that case: `Trainings` → `EXPORT`, uninstall the old version, install the
+new one, `IMPORT`.
 
-## Pierwsze kroki
+## Getting started
 
-1. Wejdź w `Settings`, ustaw rundy oraz czasy pracy, przerwy i przygotowania, zapisz.
-2. Na ekranie timera naciśnij start.
-3. Aby zachować konfigurację, wejdź w `Trainings` i zapisz ją pod nazwą.
+1. Open `Settings`, set the rounds and the work, rest and prepare durations, then save.
+2. On the timer screen, press start.
+3. To keep the configuration, open `Trainings` and save it under a name.
 
-## Dane i prywatność
+## Data and privacy
 
-Wszystkie dane zostają na urządzeniu. Aplikacja nie ma konta, logowania ani połączenia z siecią.
-Treningi są przechowywane lokalnie, a jedynym sposobem ich przeniesienia jest ręczny eksport
-do pliku JSON.
+All data stays on the device. The app has no account, no login and no network
+connection. Workouts are stored locally, and the only way to move them is a manual
+export to a JSON file.
 
-## Licencja
+## License
 
-MIT — szczegóły w pliku [`LICENSE`](LICENSE).
+MIT — see [`LICENSE`](LICENSE) for details.
