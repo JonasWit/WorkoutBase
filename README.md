@@ -1,11 +1,44 @@
-# WorkoutBase
+<div align="center">
 
-An interval training timer for Android: prepare, work and rest rounds, sound and
-vibration cues, saved workouts and screen-off operation.
+<img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="112" alt="WorkoutBase icon">
+
+<h1>WorkoutBase</h1>
+
+<p><strong>Set the rounds. Press start. Follow the cues.</strong></p>
+
+<p>An interval training timer for Android that stays readable from across the room,<br>
+keeps running with the screen off, and remembers your workouts.</p>
+
+<p>
+  <a href="https://github.com/JonasWit/workoutbase/releases/latest"><img src="https://img.shields.io/github/v/release/JonasWit/workoutbase?style=flat-square&label=release&color=c9a227" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License: MIT"></a>
+  <a href="#installation"><img src="https://img.shields.io/badge/Android-7.0%2B-3ddc84?style=flat-square&logo=android&logoColor=white" alt="Android 7.0+"></a>
+</p>
+
+<p><strong><a href="https://github.com/JonasWit/workoutbase/releases/latest">Download the latest APK</a></strong></p>
+
+</div>
+
+---
+
+## Why WorkoutBase
+
+- **Read it from across the room.** The countdown is large enough to follow from
+  several meters away, so you do not have to pick up the phone mid-set.
+- **Know the phase at a glance.** A progress ring and a session bar show where you
+  are, while the flame background changes color and speed with each phase.
+- **Hear and feel every change.** Sound and vibration mark the start of work, the
+  end of a round, the half-way point and the end of the workout.
+- **Keep training with the screen off.** A foreground service keeps the timer
+  running, and the notification shows the time left.
+- **Reuse your workouts.** Save up to 20 named configurations, load one in a tap,
+  and back them all up to a single JSON file.
+- **Keep your data.** No account, no login, no network permission — everything
+  stays on the phone.
 
 ## Features
 
-**Interval timer**
+### Interval timer
 
 - phases: prepare, work, rest and finish, with automatic transition to the next round
 - configurable number of rounds and work, rest and prepare durations
@@ -14,7 +47,7 @@ vibration cues, saved workouts and screen-off operation.
 - start, pause, resume, reset and skip phase
 - quick 15-second extension and shortening of the current phase
 
-**During a workout**
+### During a workout
 
 - large countdown readable from several meters away
 - progress ring for the current phase
@@ -24,7 +57,7 @@ vibration cues, saved workouts and screen-off operation.
 - the screen stays on during a session
 - the timer keeps running with the screen off, with a notification showing the remaining time
 
-**Saved workouts**
+### Saved workouts
 
 - save the current configuration as a named workout
 - up to 20 saved workouts
@@ -32,34 +65,45 @@ vibration cues, saved workouts and screen-off operation.
 - export all workouts to a JSON file and import from a file
 - import reports how many workouts were added and how many were skipped because of the limit
 
-**Interface**
+### Interface
 
 - four screens: timer, settings, workout list and workout editor
-- all text available in Polish and English in the source string resources
+- all user-facing text lives in the Android string resources
 - version number shown under the title on the main screen
+
+## The four screens
+
+| Screen | What you do there |
+| --- | --- |
+| **Timer** | Start, pause, resume, reset or skip a phase, adjust the current phase by 15 seconds, and follow the round and session progress. |
+| **Settings** | Set the rounds and the prepare, work and rest durations, choose the countdown and half-way cues, and toggle sound and vibration. |
+| **Trainings** | Preview, load, edit or delete saved workouts, and export or import the JSON backup. |
+| **Edit training** | Rename a saved workout and change its parameters. |
 
 ## Installation
 
-Download `app-release.apk` from the
-[Releases](https://github.com/JonasWit/workoutbase/releases) tab and open it on your
-phone. Android may ask for permission to install from an unknown source.
+1. Download `app-release.apk` from the
+   [Releases](https://github.com/JonasWit/workoutbase/releases/latest) tab.
+2. Open the file on your phone. If Android asks, allow installing from this source.
 
-If you have an older version signed with a different key, the system will refuse the
-update. In that case: `Trainings` → `EXPORT`, uninstall the old version, install the
-new one, `IMPORT`.
+> **Updating from a build signed with a different key?** Android will refuse the
+> update. Open `Trainings` → `EXPORT`, uninstall the old version, install the new
+> one, then use `IMPORT` to restore your workouts.
 
-## Getting started
+## Your first workout
 
-1. Open `Settings`, set the rounds and the work, rest and prepare durations, then save.
-2. On the timer screen, press start.
-3. To keep the configuration, open `Trainings` and save it under a name.
+1. Open `Settings`, set the rounds and the prepare, work and rest durations, then save.
+2. Go back to the timer and press **START**.
+3. To keep this setup, open `Trainings`, press **SAVE CURRENT WORKOUT** and give it a name.
 
 ## Data and privacy
 
 All data stays on the device. The app has no account, no login and no network
-connection. Workouts are stored locally, and the only way to move them is a manual
-export to a JSON file.
+permission, so nothing is uploaded. Workouts are stored locally, and the only way to
+move them is a manual export to a JSON file.
 
 ## License
 
 MIT — see [`LICENSE`](LICENSE) for details.
+
+<div align="center"><sub>Built with Kotlin and Jetpack Compose.</sub></div>
